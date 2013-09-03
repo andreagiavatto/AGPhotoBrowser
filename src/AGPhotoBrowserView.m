@@ -69,7 +69,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-	return [_dataSource numberOfPhotos];
+	return [_dataSource numberOfPhotosForPhotoBrowser:self];
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -113,11 +113,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 		[cell.contentView addSubview:imageView];
 	}
 	
-	if ([_dataSource respondsToSelector:@selector(imageAtIndex:)]) {
-		imageView.image = [_dataSource imageAtIndex:indexPath.row];
-	} else {
-		imageView.image = nil;
-	}
+    imageView.image = [_dataSource photoBrowser:self imageAtIndex:indexPath.row];
 }
 
 
@@ -147,12 +143,12 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	
 	int index = floor(targetContentOffset.y / CGRectGetWidth(self.frame));
 	
-	if ([_dataSource respondsToSelector:@selector(titleForImageAtIndex:)]) {
-		self.overlayView.title = [_dataSource titleForImageAtIndex:index];
+	if ([_dataSource respondsToSelector:@selector(photoBrowser:titleForImageAtIndex:)]) {
+		self.overlayView.title = [_dataSource photoBrowser:self titleForImageAtIndex:index];
 	}
 	
-	if ([_dataSource respondsToSelector:@selector(descriptionForImageAtIndex:)]) {
-		self.overlayView.description = [_dataSource descriptionForImageAtIndex:index];
+	if ([_dataSource respondsToSelector:@selector(photoBrowser:descriptionForImageAtIndex:)]) {
+		self.overlayView.description = [_dataSource photoBrowser:self descriptionForImageAtIndex:index];
 	}
 }
 
@@ -191,7 +187,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)showFromIndex:(NSInteger)initialIndex
 {
-	if (initialIndex < [_dataSource numberOfPhotos]) {
+	if (initialIndex < [_dataSource numberOfPhotosForPhotoBrowser:self]) {
 		[self.photoTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:initialIndex inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
 	}
 	
