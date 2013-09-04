@@ -10,11 +10,12 @@
 
 @protocol AGPhotoBrowserDataSource <NSObject>
 
-- (NSInteger)numberOfPhotos;
-- (UIImage *)imageAtIndex:(NSInteger)index;
+- (NSInteger)numberOfPhotosForPhotoBrowser:(AGPhotoBrowserView *)photoBrowser;
+- (UIImage *)photoBrowser:(AGPhotoBrowserView *)photoBrowser imageAtIndex:(NSInteger)index;
 
 @optional
-- (NSString *)titleForImageAtIndex:(NSInteger)index;
-- (NSString *)descriptionForImageAtIndex:(NSInteger)index;
+
+- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser titleForImageAtIndex:(NSInteger)index;
+- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser descriptionForImageAtIndex:(NSInteger)index;
 
 @end

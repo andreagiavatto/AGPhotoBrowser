@@ -110,28 +110,28 @@
 		[cell.contentView addSubview:imageView];
 	}
 	
-	imageView.image = [self imageAtIndex:indexPath.row];
+	imageView.image = [self photoBrowser:self.browserView imageAtIndex:indexPath.row];
 }
 
 
 #pragma mark - AGPhotoBrowser datasource
 
-- (NSInteger)numberOfPhotos
+- (NSInteger)numberOfPhotosForPhotoBrowser:(AGPhotoBrowserView *)photoBrowser
 {
 	return _samplePictures.count;
 }
 
-- (UIImage *)imageAtIndex:(NSInteger)index
+- (UIImage *)photoBrowser:(AGPhotoBrowserView *)photoBrowser imageAtIndex:(NSInteger)index
 {
 	return [[_samplePictures objectAtIndex:index] objectForKey:@"Image"];
 }
 
-- (NSString *)titleForImageAtIndex:(NSInteger)index
+- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser titleForImageAtIndex:(NSInteger)index
 {
 	return [[_samplePictures objectAtIndex:index] objectForKey:@"Title"];
 }
 
-- (NSString *)descriptionForImageAtIndex:(NSInteger)index
+- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser descriptionForImageAtIndex:(NSInteger)index
 {
 	return [[_samplePictures objectAtIndex:index] objectForKey:@"Description"];
 }
