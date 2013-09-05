@@ -33,11 +33,10 @@
 
 @implementation AGPhotoBrowserOverlayView
 
-- (id)initWithFrame:(CGRect)frame
+- (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
-        // Initialization code
 		[self setupView];
     }
     return self;
@@ -84,14 +83,12 @@
 - (void)showOverlayAnimated:(BOOL)animated
 {
 	_animated = animated;
-	
 	self.visible = YES;
 }
 
 - (void)hideOverlayAnimated:(BOOL)animated
 {
 	_animated = animated;
-	
 	self.visible = NO;
 }
 
@@ -121,15 +118,15 @@
 
 - (void)_actionButtonTapped:(UIButton *)sender
 {
-	if ([self.delegate respondsToSelector:@selector(sharingView:didTapOnActionButton:)]) {
-		[self.delegate sharingView:self didTapOnActionButton:sender];
+	if ([_delegate respondsToSelector:@selector(sharingView:didTapOnActionButton:)]) {
+		[_delegate sharingView:self didTapOnActionButton:sender];
 	}
 }
 
 - (void)_seeMoreButtonTapped:(UIButton *)sender
 {
-	if ([self.delegate respondsToSelector:@selector(sharingView:didTapOnSeeMoreButton:)]) {
-		[self.delegate sharingView:self didTapOnSeeMoreButton:sender];
+	if ([_delegate respondsToSelector:@selector(sharingView:didTapOnSeeMoreButton:)]) {
+		[_delegate sharingView:self didTapOnSeeMoreButton:sender];
 		self.descriptionExpanded = YES;
 		[self setNeedsLayout];
 		[self.sharingView addGestureRecognizer:self.tapGesture];
@@ -158,18 +155,9 @@
 {
 	_visible = visible;
 	
-	CGFloat newAlpha;
+	CGFloat newAlpha = _visible ? 1. : 0.;
 	
-	if (_visible) {
-		newAlpha = 1.;
-	} else {
-		newAlpha = 0.;
-	}
-	
-	NSTimeInterval animationDuration = AGPhotoBrowserAnimationDuration;
-	if (!_animated) {
-		animationDuration = 0;
-	}
+	NSTimeInterval animationDuration = _animated ? AGPhotoBrowserAnimationDuration : 0;
 	
 	[UIView animateWithDuration:animationDuration
 					 animations:^(){

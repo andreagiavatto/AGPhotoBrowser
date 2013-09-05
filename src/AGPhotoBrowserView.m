@@ -13,12 +13,11 @@
 
 
 @interface AGPhotoBrowserView () <
-									AGPhotoBrowserOverlayViewDelegate,
-									UITableViewDataSource,
-									UITableViewDelegate,
-									UIGestureRecognizerDelegate
-								 >
-{
+AGPhotoBrowserOverlayViewDelegate,
+UITableViewDataSource,
+UITableViewDelegate,
+UIGestureRecognizerDelegate
+> {
 	CGPoint _startingPanPoint;
 	BOOL _wantedFullscreenLayout;
 	CGRect _originalParentViewFrame;
@@ -27,7 +26,6 @@
 @property (nonatomic, strong, readwrite) UIButton *doneButton;
 @property (nonatomic, strong) UITableView *photoTableView;
 @property (nonatomic, strong) AGPhotoBrowserOverlayView *overlayView;
-
 
 @property (nonatomic, assign, getter = isDisplayingDetailedView) BOOL displayingDetailedView;
 
@@ -61,15 +59,16 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 }
 
 
+#pragma mark - UITableViewDataSource
 
-#pragma mark - UITableView dataSource
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
     return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-	return [_dataSource numberOfPhotos];
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+	return [_dataSource numberOfPhotosForPhotoBrowser:self];
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -77,7 +76,8 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	cell.backgroundColor = [UIColor clearColor];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
@@ -89,7 +89,8 @@ const int AGPhotoBrowserThresholdToCenter = 150;
     return cell;
 }
 
-- (void)configureCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)configureCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
     UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:1];
 	if (!imageView) {
 		imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
@@ -113,22 +114,19 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 		[cell.contentView addSubview:imageView];
 	}
 	
-	if ([_dataSource respondsToSelector:@selector(imageAtIndex:)]) {
-		imageView.image = [_dataSource imageAtIndex:indexPath.row];
-	} else {
-		imageView.image = nil;
-	}
+    imageView.image = [_dataSource photoBrowser:self imageAtIndex:indexPath.row];
 }
 
 
-#pragma mark - UITableView delegate
+#pragma mark - UITableViewDelegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
     self.displayingDetailedView = !self.isDisplayingDetailedView;
 }
 
 
-#pragma mark - UIScrollView delegate
+#pragma mark - UIScrollViewDelegate
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
@@ -147,12 +145,12 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	
 	int index = floor(targetContentOffset.y / CGRectGetWidth(self.frame));
 	
-	if ([_dataSource respondsToSelector:@selector(titleForImageAtIndex:)]) {
-		self.overlayView.title = [_dataSource titleForImageAtIndex:index];
+	if ([_dataSource respondsToSelector:@selector(photoBrowser:titleForImageAtIndex:)]) {
+		self.overlayView.title = [_dataSource photoBrowser:self titleForImageAtIndex:index];
 	}
 	
-	if ([_dataSource respondsToSelector:@selector(descriptionForImageAtIndex:)]) {
-		self.overlayView.description = [_dataSource descriptionForImageAtIndex:index];
+	if ([_dataSource respondsToSelector:@selector(photoBrowser:descriptionForImageAtIndex:)]) {
+		self.overlayView.description = [_dataSource photoBrowser:self descriptionForImageAtIndex:index];
 	}
 }
 
@@ -191,7 +189,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)showFromIndex:(NSInteger)initialIndex
 {
-	if (initialIndex < [_dataSource numberOfPhotos]) {
+	if (initialIndex < [_dataSource numberOfPhotosForPhotoBrowser:self]) {
 		[self.photoTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:initialIndex inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
 	}
 	
@@ -223,36 +221,12 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 }
 
 
-#pragma mark - Private methods
-
-- (void)_doneButtonTapped:(UIButton *)sender
-{
-	if ([self.delegate respondsToSelector:@selector(photoBrowser:didTapOnDoneButton:)]) {
-		self.displayingDetailedView = NO;
-		[self.delegate photoBrowser:self didTapOnDoneButton:sender];
-	}
-}
-
-- (UIViewController*)_viewController
-{
-    for (UIView* next = [self superview]; next; next = next.superview) {
-        UIResponder* nextResponder = [next nextResponder];
-		
-        if ([nextResponder isKindOfClass:[UIViewController class]]) {
-            return (UIViewController*)nextResponder;
-		}
-	}
-	
-    return nil;
-}
-
-
-#pragma mark - AGPhotoBrowserSharingView delegate
+#pragma mark - AGPhotoBrowserOverlayViewDelegate
 
 - (void)sharingView:(AGPhotoBrowserOverlayView *)sharingView didTapOnActionButton:(UIButton *)actionButton
 {
-	if ([self.delegate respondsToSelector:@selector(photoBrowser:didTapOnActionButton:)]) {
-		[self.delegate photoBrowser:self didTapOnActionButton:actionButton];
+	if ([_delegate respondsToSelector:@selector(photoBrowser:didTapOnActionButton:)]) {
+		[_delegate photoBrowser:self didTapOnActionButton:actionButton];
 	}
 }
 
@@ -270,7 +244,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 }
 
 
-#pragma mark - UIGestureRecognizer delegate
+#pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)gestureRecognizer
 {
@@ -422,5 +396,28 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	return _overlayView;
 }
 
+
+#pragma mark - Private methods
+
+- (void)_doneButtonTapped:(UIButton *)sender
+{
+	if ([_delegate respondsToSelector:@selector(photoBrowser:didTapOnDoneButton:)]) {
+		self.displayingDetailedView = NO;
+		[_delegate photoBrowser:self didTapOnDoneButton:sender];
+	}
+}
+
+- (UIViewController*)_viewController
+{
+    for (UIView* next = [self superview]; next; next = next.superview) {
+        UIResponder* nextResponder = [next nextResponder];
+		
+        if ([nextResponder isKindOfClass:[UIViewController class]]) {
+            return (UIViewController*)nextResponder;
+		}
+	}
+	
+    return nil;
+}
 
 @end

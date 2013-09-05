@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+static const float AGPhotoBrowserAnimationDuration = 0.25;
+static const int AGPhotoBrowserOverlayInitialHeight	= 120;
 
 @class AGPhotoBrowserOverlayView;
 
@@ -18,10 +20,6 @@
 - (void)sharingView:(AGPhotoBrowserOverlayView *)sharingView didTapOnSeeMoreButton:(UIButton *)actionButton;
 
 @end
-
-
-static const float AGPhotoBrowserAnimationDuration = 0.25;
-static const int AGPhotoBrowserOverlayInitialHeight	= 120;
 
 @interface AGPhotoBrowserOverlayView : UIView
 
