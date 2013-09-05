@@ -161,7 +161,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)show
 {
-	if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
+	if (([[[UIDevice currentDevice] systemVersion] compare:@"7" options:NSNumericSearch] == NSOrderedAscending)) {
 		// For iOS < 7
 		UIViewController *parentViewController = [self _viewController];
 		if (parentViewController) {
@@ -200,7 +200,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)hide
 {
-	if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
+	if (([[[UIDevice currentDevice] systemVersion] compare:@"7" options:NSNumericSearch] == NSOrderedAscending)) {
 		// For iOS < 7
 		UIViewController *parentViewController = [self _viewController];
 		if (parentViewController) {
