@@ -21,6 +21,7 @@ UIGestureRecognizerDelegate
 	CGPoint _startingPanPoint;
 	BOOL _wantedFullscreenLayout;
 	CGRect _originalParentViewFrame;
+	NSInteger _currentlySelectedIndex;
 }
 
 @property (nonatomic, strong, readwrite) UIButton *doneButton;
@@ -52,6 +53,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 {
 	self.userInteractionEnabled = NO;
 	self.backgroundColor = [UIColor colorWithWhite:0. alpha:0.];
+	_currentlySelectedIndex = NSNotFound;
 	
 	[self addSubview:self.photoTableView];
 	[self addSubview:self.doneButton];
@@ -145,6 +147,8 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	
 	int index = floor(targetContentOffset.y / CGRectGetWidth(self.frame));
 	
+	_currentlySelectedIndex = index;
+	
 	if ([_dataSource respondsToSelector:@selector(photoBrowser:titleForImageAtIndex:)]) {
 		self.overlayView.title = [_dataSource photoBrowser:self titleForImageAtIndex:index];
 	}
@@ -227,8 +231,8 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)sharingView:(AGPhotoBrowserOverlayView *)sharingView didTapOnActionButton:(UIButton *)actionButton
 {
-	if ([_delegate respondsToSelector:@selector(photoBrowser:didTapOnActionButton:)]) {
-		[_delegate photoBrowser:self didTapOnActionButton:actionButton];
+	if ([_delegate respondsToSelector:@selector(photoBrowser:didTapOnActionButton:atIndex:)]) {
+		[_delegate photoBrowser:self didTapOnActionButton:actionButton atIndex:_currentlySelectedIndex];
 	}
 }
 

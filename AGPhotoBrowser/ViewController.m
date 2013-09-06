@@ -158,9 +158,9 @@
 	}];
 }
 
-- (void)photoBrowser:(AGPhotoBrowserView *)photoBrowser didTapOnActionButton:(UIButton *)actionButton
+- (void)photoBrowser:(AGPhotoBrowserView *)photoBrowser didTapOnActionButton:(UIButton *)actionButton atIndex:(NSInteger)index
 {
-	NSLog(@"Action button tapped!");
+	NSLog(@"Action button tapped at index %d!", index);
 	UIActionSheet *action = [[UIActionSheet alloc] initWithTitle:@""
 														delegate:nil
 											   cancelButtonTitle:NSLocalizedString(@"Cancel", @"Cancel button")
