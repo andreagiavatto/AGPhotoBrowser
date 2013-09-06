@@ -72,7 +72,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	return 100;
+	return 140;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -104,12 +104,22 @@
 {
 	UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:1];
 	if (!imageView) {
-		imageView = [[UIImageView alloc] initWithFrame:CGRectMake(115, 5, 90, 90)];imageView.contentMode = UIViewContentModeScaleAspectFit;
+		imageView = [[UIImageView alloc] initWithFrame:CGRectMake(115, 35, 90, 90)];imageView.contentMode = UIViewContentModeScaleAspectFit;
 		imageView.tag = 1;
 		
 		[cell.contentView addSubview:imageView];
 	}
 	
+	UILabel *titleLabel = (UILabel *)[cell.contentView viewWithTag:2];
+	if (!titleLabel) {
+		titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 15, 280, 15)];
+		titleLabel.font = [UIFont boldSystemFontOfSize:17];
+		titleLabel.textAlignment = NSTextAlignmentCenter;
+		
+		[cell.contentView addSubview:titleLabel];
+	}
+	
+	titleLabel.text = [self photoBrowser:self.browserView titleForImageAtIndex:indexPath.row];
 	imageView.image = [self photoBrowser:self.browserView imageAtIndex:indexPath.row];
 }
 
@@ -143,7 +153,9 @@
 {
 	// -- Dismiss
 	NSLog(@"Dismiss the photo browser here");
-	[self.browserView hide];
+	[self.browserView hideWithCompletion:^(BOOL finished){
+		NSLog(@"Dismissed!");
+	}];
 }
 
 - (void)photoBrowser:(AGPhotoBrowserView *)photoBrowser didTapOnActionButton:(UIButton *)actionButton

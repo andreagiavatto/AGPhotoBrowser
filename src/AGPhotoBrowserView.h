@@ -20,6 +20,6 @@
 
 - (void)show;
 - (void)showFromIndex:(NSInteger)initialIndex;
-- (void)hide;
+- (void)hideWithCompletion:( void (^) (BOOL finished) )completionBlock;
 
 @end

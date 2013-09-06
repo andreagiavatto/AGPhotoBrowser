@@ -93,7 +93,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 {
     UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:1];
 	if (!imageView) {
-		imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
+		imageView = [[UIImageView alloc] initWithFrame:self.bounds];
 		imageView.userInteractionEnabled = YES;
 		
 		UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_imageViewPanned:)];
@@ -103,7 +103,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 		[imageView addGestureRecognizer:panGesture];
 		imageView.contentMode = UIViewContentModeScaleAspectFit;
 		imageView.tag = 1;
-		
+				
 		CGAffineTransform transform = CGAffineTransformMakeRotation(M_PI_2);
 		CGPoint origin = imageView.frame.origin;
 		imageView.transform = transform;
@@ -141,7 +141,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	CGRect rectForTopRowAfterScrolling = [tv rectForRowAtIndexPath:
 										  indexPathOfTopRowAfterScrolling
 										  ];
-	targetContentOffset.y=rectForTopRowAfterScrolling.origin.y;
+	targetContentOffset.y = rectForTopRowAfterScrolling.origin.y;
 	
 	int index = floor(targetContentOffset.y / CGRectGetWidth(self.frame));
 	
@@ -196,9 +196,8 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	[self show];
 }
 
-- (void)hide
-{
-	if (([[[UIDevice currentDevice] systemVersion] compare:@"7" options:NSNumericSearch] == NSOrderedAscending)) {
+- (void)hideWithCompletion:( void (^) (BOOL finished) )completionBlock {
+    if (([[[UIDevice currentDevice] systemVersion] compare:@"7" options:NSNumericSearch] == NSOrderedAscending)) {
 		// For iOS < 7
 		UIViewController *parentViewController = [self _viewController];
 		if (parentViewController) {
@@ -217,6 +216,9 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 					 }
 					 completion:^(BOOL finished){
 						 self.userInteractionEnabled = NO;
+						 if(completionBlock) {
+							 completionBlock(finished);
+						 }
 					 }];
 }
 
@@ -295,12 +297,13 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 							 }];
 		} else {
 			// -- Animate out!
-			[self hide];
-			[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
-							 animations:^(){}
-							 completion:^(BOOL finished){
-								 imageView.center = self->_startingPanPoint;
-							 }];
+			typeof(self) weakSelf __weak = self;
+			[self hideWithCompletion:^(BOOL finished){
+				typeof(weakSelf) strongSelf __strong = weakSelf;
+				if (strongSelf) {
+					imageView.center = strongSelf->_startingPanPoint;
+				}
+			}];
 		}
 	} else {
 		CGPoint middlePanPoint = [recognizer translationInView:self];
