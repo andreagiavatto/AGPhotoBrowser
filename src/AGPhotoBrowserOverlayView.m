@@ -50,14 +50,34 @@
 	
 	self.titleLabel.frame = CGRectMake(20, 35, CGRectGetWidth(self.frame) - 40, 20);
 	self.separatorView.frame = CGRectMake(20, CGRectGetMinY(self.titleLabel.frame) + CGRectGetHeight(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), 1);
+    
+    if ([self.descriptionLabel.text length]) {
+        CGSize descriptionSize = [self.descriptionLabel.text sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(self.descriptionLabel.frame.size.width, MAXFLOAT)];
+        if (descriptionSize.height > self.descriptionLabel.frame.size.height) {
+            self.seeMoreButton.hidden = NO;
+        } else {
+            self.seeMoreButton.hidden = YES;
+        }
+        self.descriptionLabel.hidden = NO;
+    } else {
+        self.descriptionLabel.hidden = YES;
+        self.seeMoreButton.hidden = YES;
+    }
+    
 	if (self.descriptionExpanded) {
 		CGSize descriptionSize = [_description sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 40, MAXFLOAT)];
 		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 280, descriptionSize.height);
-		self.seeMoreButton.hidden = YES;
 	} else {
-		self.seeMoreButton.hidden = NO;
 		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 220, 20);
 		self.seeMoreButton.frame = CGRectMake(240, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 65, 20);
+	}
+    
+    if ([_title length]) {
+		self.titleLabel.hidden = NO;
+		self.separatorView.hidden = NO;
+	} else {
+		self.titleLabel.hidden = YES;
+		self.separatorView.hidden = YES;
 	}
 	
 	self.actionButton.frame = CGRectMake(CGRectGetWidth(self.sharingView.frame) - 55 - 10, CGRectGetHeight(self.sharingView.frame) - 32 - 5, 55, 32);
@@ -67,7 +87,7 @@
 {
 	self.alpha = 0;
 	self.userInteractionEnabled = YES;
-
+    
 	[self.sharingView addSubview:self.titleLabel];
 	[self.sharingView addSubview:self.separatorView];
 	[self.sharingView addSubview:self.descriptionLabel];
@@ -170,15 +190,11 @@
 {
 	_title = title;
 	
-	if ([_title length]) {
-		self.titleLabel.text = _title;
-		self.titleLabel.hidden = NO;
-		self.separatorView.hidden = NO;
-	} else {
-		self.titleLabel.text = @"";
-		self.titleLabel.hidden = YES;
-		self.separatorView.hidden = YES;
-	}
+    if (_title) {
+        self.titleLabel.text = _title;
+    }
+    
+    [self setNeedsLayout];
 }
 
 - (void)setDescription:(NSString *)description
@@ -186,20 +202,12 @@
 	_description = description;
 	
 	if ([_description length]) {
-		CGSize descriptionSize = [_description sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(self.descriptionLabel.frame.size.width, MAXFLOAT)];
-		if (descriptionSize.height > self.descriptionLabel.frame.size.height) {
-			self.seeMoreButton.hidden = NO;
-		} else {
-			self.seeMoreButton.hidden = YES;
-		}
-		
 		self.descriptionLabel.text = _description;
-		self.descriptionLabel.hidden = NO;
 	} else {
 		self.descriptionLabel.text = @"";
-		self.descriptionLabel.hidden = YES;
-		self.seeMoreButton.hidden = YES;
 	}
+    
+    [self setNeedsLayout];
 }
 
 
@@ -209,7 +217,6 @@
 {
 	if (!_sharingView) {
 		_sharingView = [[UIView alloc] initWithFrame:self.bounds];
-		//_sharingView .backgroundColor = [UIColor blueColor];
 		_gradientLayer = [CAGradientLayer layer];
 		_gradientLayer.frame = self.bounds;
 		_gradientLayer.colors = [NSArray arrayWithObjects:(id)[[UIColor clearColor] CGColor], (id)[[UIColor blackColor] CGColor], nil];
@@ -236,6 +243,7 @@
 	if (!_separatorView) {
 		_separatorView = [[UIView alloc] initWithFrame:CGRectMake(20, CGRectGetMinY(self.titleLabel.frame) + CGRectGetHeight(self.titleLabel.frame), 280, 1)];
 		_separatorView.backgroundColor = [UIColor lightGrayColor];
+        _separatorView.hidden = YES;
 	}
 	
 	return _separatorView;
@@ -262,6 +270,7 @@
 		[_seeMoreButton setBackgroundColor:[UIColor clearColor]];
 		[_seeMoreButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
 		_seeMoreButton.titleLabel.font = [UIFont boldSystemFontOfSize:13];
+        _seeMoreButton.hidden = YES;
 		
 		[_seeMoreButton addTarget:self action:@selector(_seeMoreButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 	}
@@ -278,7 +287,7 @@
 		[_actionButton setTitleColor:[UIColor colorWithWhite:0.9 alpha:0.9] forState:UIControlStateNormal];
 		[_actionButton setTitleColor:[UIColor colorWithWhite:0.9 alpha:0.9] forState:UIControlStateHighlighted];
 		[_actionButton.titleLabel setFont:[UIFont boldSystemFontOfSize:10.0f]];
-		
+        
 		[_actionButton addTarget:self action:@selector(_actionButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 	}
 	

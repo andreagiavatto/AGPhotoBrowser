@@ -20,6 +20,7 @@ UIGestureRecognizerDelegate
 > {
 	CGPoint _startingPanPoint;
 	BOOL _wantedFullscreenLayout;
+    BOOL _navigationBarWasHidden;
 	CGRect _originalParentViewFrame;
 	NSInteger _currentlySelectedIndex;
 }
@@ -105,7 +106,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 		[imageView addGestureRecognizer:panGesture];
 		imageView.contentMode = UIViewContentModeScaleAspectFit;
 		imageView.tag = 1;
-				
+        
 		CGAffineTransform transform = CGAffineTransformMakeRotation(M_PI_2);
 		CGPoint origin = imageView.frame.origin;
 		imageView.transform = transform;
@@ -135,7 +136,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	[self.overlayView resetOverlayView];
 	
 	CGPoint targetContentOffset = scrollView.contentOffset;
-
+    
 	UITableView *tv = (UITableView*)scrollView;
 	NSIndexPath *indexPathOfTopRowAfterScrolling = [tv indexPathForRowAtPoint:
 													targetContentOffset
@@ -151,11 +152,15 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	
 	if ([_dataSource respondsToSelector:@selector(photoBrowser:titleForImageAtIndex:)]) {
 		self.overlayView.title = [_dataSource photoBrowser:self titleForImageAtIndex:index];
-	}
+	} else {
+        self.overlayView.title = @"";
+    }
 	
 	if ([_dataSource respondsToSelector:@selector(photoBrowser:descriptionForImageAtIndex:)]) {
 		self.overlayView.description = [_dataSource photoBrowser:self descriptionForImageAtIndex:index];
-	}
+	} else {
+        self.overlayView.description = @"";
+    }
 }
 
 
@@ -163,17 +168,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)show
 {
-	if (([[[UIDevice currentDevice] systemVersion] compare:@"7" options:NSNumericSearch] == NSOrderedAscending)) {
-		// For iOS < 7
-		UIViewController *parentViewController = [self _viewController];
-		if (parentViewController) {
-			_wantedFullscreenLayout = parentViewController.wantsFullScreenLayout;
-			_originalParentViewFrame = parentViewController.view.frame;
-			parentViewController.wantsFullScreenLayout = YES;
-			[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
-			[parentViewController.view setFrame:[UIScreen mainScreen].bounds];
-		}
-	}
+    [[[UIApplication sharedApplication].windows lastObject] addSubview:self];
 	
 	[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
 					 animations:^(){
@@ -200,17 +195,8 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	[self show];
 }
 
-- (void)hideWithCompletion:( void (^) (BOOL finished) )completionBlock {
-    if (([[[UIDevice currentDevice] systemVersion] compare:@"7" options:NSNumericSearch] == NSOrderedAscending)) {
-		// For iOS < 7
-		UIViewController *parentViewController = [self _viewController];
-		if (parentViewController) {
-			parentViewController.wantsFullScreenLayout = _wantedFullscreenLayout;
-			[[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
-			[parentViewController.view setFrame:_originalParentViewFrame];
-		}
-	}
-	
+- (void)hideWithCompletion:( void (^) (BOOL finished) )completionBlock
+{
 	[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
 					 animations:^(){
 						 self.photoTableView.alpha = 0.;
@@ -220,6 +206,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 					 }
 					 completion:^(BOOL finished){
 						 self.userInteractionEnabled = NO;
+                         [self removeFromSuperview];
 						 if(completionBlock) {
 							 completionBlock(finished);
 						 }
@@ -273,6 +260,8 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	UIImageView *imageView = (UIImageView *)recognizer.view;
 	
 	if (recognizer.state == UIGestureRecognizerStateBegan) {
+        // -- Show back status bar
+        [[UIApplication sharedApplication] setStatusBarHidden:NO];
 		// -- Disable table view scrolling
 		self.photoTableView.scrollEnabled = NO;
 		// -- Hide detailed view
@@ -290,12 +279,15 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 		int heightDifference = abs(floor(_startingPanPoint.x - translatedPoint.x));
 		
 		if (heightDifference <= AGPhotoBrowserThresholdToCenter) {
+            
 			// -- Back to original center
 			[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
 							 animations:^(){
 								 self.backgroundColor = [UIColor colorWithWhite:0. alpha:1.];
 								 imageView.center = self->_startingPanPoint;
 							 } completion:^(BOOL finished){
+                                 // -- Hide status bar
+                                 [[UIApplication sharedApplication] setStatusBarHidden:YES];
 								 // -- show detailed view?
 								 self.displayingDetailedView = YES;
 							 }];
@@ -414,17 +406,5 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	}
 }
 
-- (UIViewController*)_viewController
-{
-    for (UIView* next = [self superview]; next; next = next.superview) {
-        UIResponder* nextResponder = [next nextResponder];
-		
-        if ([nextResponder isKindOfClass:[UIViewController class]]) {
-            return (UIViewController*)nextResponder;
-		}
-	}
-	
-    return nil;
-}
 
 @end
