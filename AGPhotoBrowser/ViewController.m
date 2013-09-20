@@ -49,8 +49,6 @@
 		  @"Description" : @"A colorful image"
 	},
 	];
-	
-	[self.view addSubview:self.browserView];
 }
 
 - (void)didReceiveMemoryWarning
