@@ -51,7 +51,15 @@
 	self.titleLabel.frame = CGRectMake(20, 35, CGRectGetWidth(self.frame) - 40, 20);
 	self.separatorView.frame = CGRectMake(20, CGRectGetMinY(self.titleLabel.frame) + CGRectGetHeight(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), 1);
     
-    if ([self.descriptionLabel.text length]) {
+	if (self.descriptionExpanded) {
+		CGSize descriptionSize = [_description sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 40, MAXFLOAT)];
+		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 280, descriptionSize.height);
+	} else {
+		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 220, 20);
+		self.seeMoreButton.frame = CGRectMake(240, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 65, 20);
+	}
+    
+	if ([self.descriptionLabel.text length]) {
         CGSize descriptionSize = [self.descriptionLabel.text sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(self.descriptionLabel.frame.size.width, MAXFLOAT)];
         if (descriptionSize.height > self.descriptionLabel.frame.size.height) {
             self.seeMoreButton.hidden = NO;
@@ -63,15 +71,7 @@
         self.descriptionLabel.hidden = YES;
         self.seeMoreButton.hidden = YES;
     }
-    
-	if (self.descriptionExpanded) {
-		CGSize descriptionSize = [_description sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 40, MAXFLOAT)];
-		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 280, descriptionSize.height);
-	} else {
-		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 220, 20);
-		self.seeMoreButton.frame = CGRectMake(240, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 65, 20);
-	}
-    
+	
     if ([_title length]) {
 		self.titleLabel.hidden = NO;
 		self.separatorView.hidden = NO;
@@ -282,11 +282,11 @@
 {
 	if (!_actionButton) {
 		_actionButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 55 - 10, CGRectGetHeight(self.frame) - 32 - 5, 55, 32)];
-		[_actionButton setTitle:NSLocalizedString(@"◉ ◉ ◉", @"Title for Action button") forState:UIControlStateNormal];
+		[_actionButton setTitle:NSLocalizedString(@"● ● ●", @"Title for Action button") forState:UIControlStateNormal];
 		[_actionButton setBackgroundColor:[UIColor clearColor]];
 		[_actionButton setTitleColor:[UIColor colorWithWhite:0.9 alpha:0.9] forState:UIControlStateNormal];
 		[_actionButton setTitleColor:[UIColor colorWithWhite:0.9 alpha:0.9] forState:UIControlStateHighlighted];
-		[_actionButton.titleLabel setFont:[UIFont boldSystemFontOfSize:10.0f]];
+		[_actionButton.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0f]];
         
 		[_actionButton addTarget:self action:@selector(_actionButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 	}
