@@ -18,9 +18,11 @@ It currently supports:
 ## Install
 - copy the content of the 'src' folder in your project
 - import `AGPhotoBrowserView.h` in your class
-- add a new instance of `AGPhotoBrowserView` to your view controller's view
 - set up the delegate and the dataSource
-- implement `- (NSInteger)numberOfPhotos` and `- (UIImage *)imageAtIndex:(NSInteger)index:` methods
+- implement `- (NSInteger)numberOfPhotosForPhotoBrowser:(AGPhotoBrowserView *)photoBrowser` and `- (UIImage *)photoBrowser:(AGPhotoBrowserView *)photoBrowser imageAtIndex:(NSInteger)index` methods from the datasource
+- (optional) provide a title and a description for each image implementing `- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser titleForImageAtIndex:(NSInteger)index` and `- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser descriptionForImageAtIndex:(NSInteger)index`
+- show the browser calling the `- (void)show` or `- (void)showFromIndex:(NSInteger)initialIndex` methods
+- dismiss the photo browser with a completion block calling `- (void)hideWithCompletion:( void (^) (BOOL finished) )completionBlock`
 
 
 ## Resources
