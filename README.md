@@ -24,6 +24,9 @@ It currently supports:
 - show the browser calling the `- (void)show` or `- (void)showFromIndex:(NSInteger)initialIndex` methods
 - dismiss the photo browser with a completion block calling `- (void)hideWithCompletion:( void (^) (BOOL finished) )completionBlock`
 
+## TO-DO
+- add zoom support on images
+- support orientation changes
 
 ## Resources
 
