@@ -25,7 +25,7 @@ It currently supports:
 - dismiss the photo browser with a completion block calling `- (void)hideWithCompletion:( void (^) (BOOL finished) )completionBlock`
 
 ## TO-DO
-- add zoom support on images
+- add pinch to zoom gesture on images
 - support orientation changes
 
 ## Resources
