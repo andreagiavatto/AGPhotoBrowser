@@ -94,29 +94,45 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)configureCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:1];
-	if (!imageView) {
-		imageView = [[UIImageView alloc] initWithFrame:self.bounds];
+
+    UIScrollView *scrollView = (UIScrollView *)[cell.contentView viewWithTag:1];
+	if (!scrollView) {
+        
+        // Make ImageView in ScrollView
+        
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:self.bounds];
 		imageView.userInteractionEnabled = YES;
 		
+        
+		imageView.contentMode = UIViewContentModeScaleAspectFit;
+		imageView.tag = 1;
+        
+		scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+        scrollView.delegate = self;
+        scrollView.userInteractionEnabled = YES;
+        scrollView.scrollEnabled = YES;
+        [scrollView setContentSize:imageView.frame.size];
+        scrollView.minimumZoomScale = scrollView.frame.size.width / imageView.frame.size.width;
+        scrollView.maximumZoomScale = 5.0;
+        scrollView.zoomScale = scrollView.minimumZoomScale;
+        
 		UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_imageViewPanned:)];
 		panGesture.delegate = self;
 		panGesture.maximumNumberOfTouches = 1;
 		panGesture.minimumNumberOfTouches = 1;
-		[imageView addGestureRecognizer:panGesture];
-		imageView.contentMode = UIViewContentModeScaleAspectFit;
-		imageView.tag = 1;
+		[scrollView addGestureRecognizer:panGesture];
         
-		CGAffineTransform transform = CGAffineTransformMakeRotation(M_PI_2);
-		CGPoint origin = imageView.frame.origin;
-		imageView.transform = transform;
-        CGRect frame = imageView.frame;
+        CGAffineTransform transform = CGAffineTransformMakeRotation(M_PI_2);
+		CGPoint origin = scrollView.frame.origin;
+		scrollView.transform = transform;
+        CGRect frame = scrollView.frame;
         frame.origin = origin;
-        imageView.frame = frame;
-		
-		[cell.contentView addSubview:imageView];
+        scrollView.frame = frame;
+        
+        [scrollView addSubview:imageView];
+		[cell.contentView addSubview:scrollView];
 	}
-	
+	UIImageView *imageView = (UIImageView*) [scrollView viewWithTag:1];
     imageView.image = [_dataSource photoBrowser:self imageAtIndex:indexPath.row];
 }
 
@@ -133,6 +149,10 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    // This If statement restrict to sonflict
+    // between tableView's scrollView and cell's scrollView(for zooming)
+    if (![scrollView isKindOfClass:[UITableView class]]) return;
+    
 	[self.overlayView resetOverlayView];
 	
 	CGPoint targetContentOffset = scrollView.contentOffset;
@@ -161,6 +181,43 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	} else {
         self.overlayView.description = @"";
     }
+}
+
+- (void)scrollViewDidZoom:(UIScrollView *)scrollView
+{
+    if ([scrollView isKindOfClass:[UITableView class]]) return;
+    
+    UIImageView *imageView = (UIImageView*) [scrollView viewWithTag:1];
+    imageView.frame = [self centeredFrameForScrollView:scrollView andUIView:imageView];
+}
+
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
+{
+    if ([scrollView isKindOfClass:[UITableView class]]) return nil;
+    
+    return (UIImageView*) [scrollView viewWithTag:1];
+}
+
+- (CGRect)centeredFrameForScrollView:(UIScrollView *)scroll andUIView:(UIView *)rView {
+    
+    CGSize boundsSize = scroll.bounds.size;
+    CGRect frameToCenter = rView.frame;
+    // center horizontally
+    if (frameToCenter.size.width < boundsSize.width) {
+        frameToCenter.origin.x = (boundsSize.width - frameToCenter.size.width) / 2;
+    }
+    else {
+        frameToCenter.origin.x = 0;
+    }
+    // center vertically
+    if (frameToCenter.size.height < boundsSize.height) {
+        frameToCenter.origin.y = (boundsSize.height - frameToCenter.size.height) / 2;
+    }
+    else {
+        frameToCenter.origin.y = 0;
+    }
+    return frameToCenter;
+    
 }
 
 
@@ -257,6 +314,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)_imageViewPanned:(UIPanGestureRecognizer *)recognizer
 {
+    // Please Check to change imageView to scrollView
 	UIImageView *imageView = (UIImageView *)recognizer.view;
 	
 	if (recognizer.state == UIGestureRecognizerStateBegan) {
