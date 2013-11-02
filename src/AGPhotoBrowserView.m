@@ -95,20 +95,20 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 - (void)configureCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
 
-    UIScrollView *scrollView = (UIScrollView *)[cell.contentView viewWithTag:1];
+    UIScrollView *scrollView = (UIScrollView *)[cell.contentView viewWithTag:2];
 	if (!scrollView) {
         
         // Make ImageView in ScrollView
         
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:self.bounds];
 		imageView.userInteractionEnabled = YES;
-		
         
 		imageView.contentMode = UIViewContentModeScaleAspectFit;
 		imageView.tag = 1;
         
 		scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
         scrollView.delegate = self;
+        scrollView.tag = 2;
         scrollView.userInteractionEnabled = YES;
         scrollView.scrollEnabled = YES;
         [scrollView setContentSize:imageView.frame.size];
@@ -132,8 +132,15 @@ const int AGPhotoBrowserThresholdToCenter = 150;
         [scrollView addSubview:imageView];
 		[cell.contentView addSubview:scrollView];
 	}
+    
 	UIImageView *imageView = (UIImageView*) [scrollView viewWithTag:1];
     imageView.image = [_dataSource photoBrowser:self imageAtIndex:indexPath.row];
+    imageView.frame = self.bounds;
+    
+    // init ImageView frame and scrollView
+    [scrollView setContentSize:imageView.frame.size];
+    [self centeredFrameForScrollView:scrollView andUIView:imageView];
+
 }
 
 
