@@ -23,6 +23,7 @@ UIGestureRecognizerDelegate
     BOOL _navigationBarWasHidden;
 	CGRect _originalParentViewFrame;
 	NSInteger _currentlySelectedIndex;
+    UIPinchGestureRecognizer* pinch;
 }
 
 @property (nonatomic, strong, readwrite) UIButton *doneButton;
@@ -54,7 +55,17 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 {
 	self.userInteractionEnabled = NO;
 	self.backgroundColor = [UIColor colorWithWhite:0. alpha:0.];
-	_currentlySelectedIndex = NSNotFound;
+	_currentlySelectedIndex = 0;
+    
+    pinch=[[UIPinchGestureRecognizer alloc] init];
+    [pinch addTarget:self action:@selector(pinch:)];
+    [self addGestureRecognizer:pinch];
+    
+    UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_imageViewPanned:)];
+    panGesture.delegate = self;
+    panGesture.maximumNumberOfTouches = 1;
+    panGesture.minimumNumberOfTouches = 1;
+    [self addGestureRecognizer:panGesture];
 	
 	[self addSubview:self.photoTableView];
 	[self addSubview:self.doneButton];
@@ -98,14 +109,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	if (!imageView) {
 		imageView = [[UIImageView alloc] initWithFrame:self.bounds];
 		imageView.userInteractionEnabled = YES;
-		
-		UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_imageViewPanned:)];
-		panGesture.delegate = self;
-		panGesture.maximumNumberOfTouches = 1;
-		panGesture.minimumNumberOfTouches = 1;
-		[imageView addGestureRecognizer:panGesture];
-		imageView.contentMode = UIViewContentModeScaleAspectFit;
-		imageView.tag = 1;
+        
         
 		CGAffineTransform transform = CGAffineTransformMakeRotation(M_PI_2);
 		CGPoint origin = imageView.frame.origin;
@@ -118,6 +122,43 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	}
 	
     imageView.image = [_dataSource photoBrowser:self imageAtIndex:indexPath.row];
+    
+    imageView.contentMode = UIViewContentModeScaleAspectFit;
+    imageView.tag = 1;
+
+    if (!imageView.image) {
+        
+        UIActivityIndicatorView * loading=[[UIActivityIndicatorView alloc] init];
+        loading.center=self.center;
+        loading.tintColor=[UIColor whiteColor];
+        [imageView addSubview:loading];
+        [loading startAnimating];
+        
+        if ([_dataSource respondsToSelector:@selector(photoBrowser:imageURLAtIndex:)]) {
+            NSURLRequest *request=[NSURLRequest requestWithURL:[_dataSource photoBrowser:self imageURLAtIndex:indexPath.row]];
+            [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                imageView.image=[UIImage imageWithData:data];
+                [loading stopAnimating];
+                [loading removeFromSuperview];
+            }];
+        }
+    }
+    
+    if (indexPath.row == _currentlySelectedIndex) {
+	
+	if ([_dataSource respondsToSelector:@selector(photoBrowser:titleForImageAtIndex:)]) {
+		self.overlayView.title = [_dataSource photoBrowser:self titleForImageAtIndex:indexPath.row];
+	} else {
+        self.overlayView.title = @"";
+    }
+	
+	if ([_dataSource respondsToSelector:@selector(photoBrowser:descriptionForImageAtIndex:)]) {
+		self.overlayView.description = [_dataSource photoBrowser:self descriptionForImageAtIndex:indexPath.row];
+	} else {
+        self.overlayView.description = @"";
+    }
+    }
+    
 }
 
 
@@ -241,7 +282,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 - (BOOL)gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)gestureRecognizer
 {
-    UIView *imageView = [gestureRecognizer view];
+    UIView *imageView = [[_photoTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_currentlySelectedIndex inSection:0]] viewWithTag:1];
     CGPoint translation = [gestureRecognizer translationInView:[imageView superview]];
 	
     // -- Check for horizontal gesture
@@ -257,7 +298,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)_imageViewPanned:(UIPanGestureRecognizer *)recognizer
 {
-	UIImageView *imageView = (UIImageView *)recognizer.view;
+	UIImageView *imageView = (UIImageView *)[[_photoTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_currentlySelectedIndex inSection:0]] viewWithTag:1];
 	
 	if (recognizer.state == UIGestureRecognizerStateBegan) {
         // -- Show back status bar
@@ -278,8 +319,10 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 		CGPoint translatedPoint = CGPointMake(_startingPanPoint.x - endingPanPoint.y, _startingPanPoint.y);
 		int heightDifference = abs(floor(_startingPanPoint.x - translatedPoint.x));
 		
+        
 		if (heightDifference <= AGPhotoBrowserThresholdToCenter) {
-            
+
+
 			// -- Back to original center
 			[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
 							 animations:^(){
@@ -292,14 +335,26 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 								 self.displayingDetailedView = YES;
 							 }];
 		} else {
-			// -- Animate out!
-			typeof(self) weakSelf __weak = self;
-			[self hideWithCompletion:^(BOOL finished){
-				typeof(weakSelf) strongSelf __strong = weakSelf;
-				if (strongSelf) {
-					imageView.center = strongSelf->_startingPanPoint;
-				}
-			}];
+            
+            CGFloat velocity=[recognizer velocityInView:self].y;
+            
+            CGFloat destinationY=velocity<0 ? self.bounds.size.height+imageView.bounds.size.height/2 : -imageView.bounds.size.height/2;
+            NSTimeInterval duration=([UIScreen mainScreen].bounds.size.height/2-imageView.center.y)/ (velocity<0 ? -velocity : velocity);
+            
+            [UIView animateWithDuration:duration
+							 animations:^(){
+								 imageView.center = CGPointMake(destinationY,self.center.x); // because it's rotated
+							 } completion:^(BOOL finished) {
+                                 typeof(self) weakSelf __weak = self;
+                                 [self hideWithCompletion:^(BOOL finished){
+                                     typeof(weakSelf) strongSelf __strong = weakSelf;
+                                     if (strongSelf) {
+                                         imageView.center = strongSelf->_startingPanPoint;
+                                     }
+                                 }];
+
+                             }];
+
 		}
 	} else {
 		CGPoint middlePanPoint = [recognizer translationInView:self];
@@ -406,5 +461,64 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	}
 }
 
+
+#pragma mark Pinch Gesture Recognizer
+
+
+-(void)pinch:(UIPinchGestureRecognizer *)pinchRecognizer{
+    
+    
+    UIImageView* imageView=(UIImageView *)[[_photoTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_currentlySelectedIndex inSection:0]] viewWithTag:1];
+    
+  if (pinchRecognizer.state == UIGestureRecognizerStateChanged) {
+        
+        NSLog(@"gesture.scale = %f", pinchRecognizer.scale);
+        
+        CGFloat currentScale = imageView.frame.size.width / [UIScreen mainScreen].bounds.size.width;
+        CGFloat newScale = currentScale * pinchRecognizer.scale;
+        
+        if (newScale < 1) {
+            newScale = 1-(1-newScale)/2;
+        }
+        if (newScale > 3) {
+            newScale = 3+(newScale-3)/2;
+        }
+        
+        CGPoint center=imageView.center;
+        
+        imageView.frame=CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width*newScale, [UIScreen mainScreen].bounds.size.width*newScale);
+        imageView.center=center;
+        
+        pinchRecognizer.scale = 1;
+
+
+    }else if (pinchRecognizer.state==UIGestureRecognizerStateEnded){
+        
+        NSLog(@"gesture.scale = %f", pinchRecognizer.scale);
+        
+        CGFloat currentScale = imageView.frame.size.width / [UIScreen mainScreen].bounds.size.width;
+        CGFloat newScale = currentScale * pinchRecognizer.scale;
+        
+        if (newScale < 1) {
+            newScale = 1;
+        }
+        if (newScale > 3) {
+            newScale = 3;
+        }
+        
+        CGFloat width=[UIScreen mainScreen].bounds.size.width*newScale;
+        CGFloat height=[UIScreen mainScreen].bounds.size.height*newScale;
+        CGRect frame=CGRectMake(([UIScreen mainScreen].bounds.size.width-width), ([UIScreen mainScreen].bounds.size.height-height), width, height);
+        CGPoint center=imageView.center;
+
+            imageView.frame=frame;
+            imageView.center=center;
+        
+        
+        pinchRecognizer.scale = 1;
+    }
+    
+    
+}
 
 @end
