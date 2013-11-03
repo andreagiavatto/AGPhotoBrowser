@@ -301,6 +301,11 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	UIImageView *imageView = (UIImageView *)[[_photoTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_currentlySelectedIndex inSection:0]] viewWithTag:1];
 	
 	if (recognizer.state == UIGestureRecognizerStateBegan) {
+        
+            [UIView animateWithDuration:.25 animations:^{
+                imageView.frame=CGRectMake(0, 0, self.frame.size.height, self.frame.size.width);
+            }];
+        
         // -- Show back status bar
         [[UIApplication sharedApplication] setStatusBarHidden:NO];
 		// -- Disable table view scrolling
@@ -340,6 +345,8 @@ const int AGPhotoBrowserThresholdToCenter = 150;
             
             CGFloat destinationY=velocity<0 ? self.bounds.size.height+imageView.bounds.size.height/2 : -imageView.bounds.size.height/2;
             NSTimeInterval duration=([UIScreen mainScreen].bounds.size.height/2-imageView.center.y)/ (velocity<0 ? -velocity : velocity);
+            
+            duration=duration>1 ? duration=1 : duration;
             
             [UIView animateWithDuration:duration
 							 animations:^(){
@@ -474,7 +481,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
         
         NSLog(@"gesture.scale = %f", pinchRecognizer.scale);
         
-        CGFloat currentScale = imageView.frame.size.width / [UIScreen mainScreen].bounds.size.width;
+        CGFloat currentScale = imageView.frame.size.height / [UIScreen mainScreen].bounds.size.width;
         CGFloat newScale = currentScale * pinchRecognizer.scale;
         
         if (newScale < 1) {
@@ -486,7 +493,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
         
         CGPoint center=imageView.center;
         
-        imageView.frame=CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width*newScale, [UIScreen mainScreen].bounds.size.width*newScale);
+        imageView.frame=CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.height*newScale, [UIScreen mainScreen].bounds.size.width*newScale);
         imageView.center=center;
         
         pinchRecognizer.scale = 1;
@@ -496,7 +503,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
         
         NSLog(@"gesture.scale = %f", pinchRecognizer.scale);
         
-        CGFloat currentScale = imageView.frame.size.width / [UIScreen mainScreen].bounds.size.width;
+        CGFloat currentScale = imageView.frame.size.height / [UIScreen mainScreen].bounds.size.width;
         CGFloat newScale = currentScale * pinchRecognizer.scale;
         
         if (newScale < 1) {
@@ -508,7 +515,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
         
         CGFloat width=[UIScreen mainScreen].bounds.size.width*newScale;
         CGFloat height=[UIScreen mainScreen].bounds.size.height*newScale;
-        CGRect frame=CGRectMake(([UIScreen mainScreen].bounds.size.width-width), ([UIScreen mainScreen].bounds.size.height-height), width, height);
+        CGRect frame=CGRectMake(([UIScreen mainScreen].bounds.size.height-height), ([UIScreen mainScreen].bounds.size.width-width), height, width);
         CGPoint center=imageView.center;
 
             imageView.frame=frame;
