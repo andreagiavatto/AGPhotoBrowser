@@ -17,5 +17,6 @@
 
 - (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser titleForImageAtIndex:(NSInteger)index;
 - (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser descriptionForImageAtIndex:(NSInteger)index;
+- (NSURL *)photoBrowser:(AGPhotoBrowserView *)photoBrowser imageURLAtIndex:(NSInteger)index;
 
 @end
