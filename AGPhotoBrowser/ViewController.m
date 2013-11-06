@@ -144,6 +144,11 @@
 	return [[_samplePictures objectAtIndex:index] objectForKey:@"Description"];
 }
 
+- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser pageIndexForImageAtIndex:(NSInteger)index
+{
+    return _samplePictures.count>1?[NSString stringWithFormat:@"%d/%d",index+1,_samplePictures.count]:@"";
+}
+
 
 #pragma mark - AGPhotoBrowser delegate
 
