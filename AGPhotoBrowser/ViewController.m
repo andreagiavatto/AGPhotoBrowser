@@ -146,7 +146,7 @@
 
 - (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser pageIndexForImageAtIndex:(NSInteger)index
 {
-    return [NSString stringWithFormat:@"%d/%d",index+1,_samplePictures.count];
+    return _samplePictures.count>1?[NSString stringWithFormat:@"%d/%d",index+1,_samplePictures.count]:@"";
 }
 
 
