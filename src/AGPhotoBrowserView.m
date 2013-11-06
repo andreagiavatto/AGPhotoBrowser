@@ -150,17 +150,23 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 	
 	_currentlySelectedIndex = index;
 	
-	if ([_dataSource respondsToSelector:@selector(photoBrowser:titleForImageAtIndex:)]) {
-		self.overlayView.title = [_dataSource photoBrowser:self titleForImageAtIndex:index];
-	} else {
+    if ([_dataSource respondsToSelector:@selector(photoBrowser:titleForImageAtIndex:)]) {
+        self.overlayView.title = [_dataSource photoBrowser:self titleForImageAtIndex:index];
+    } else {
         self.overlayView.title = @"";
     }
-	
-	if ([_dataSource respondsToSelector:@selector(photoBrowser:descriptionForImageAtIndex:)]) {
-		self.overlayView.description = [_dataSource photoBrowser:self descriptionForImageAtIndex:index];
-	} else {
+    
+    if ([_dataSource respondsToSelector:@selector(photoBrowser:descriptionForImageAtIndex:)]) {
+        self.overlayView.description = [_dataSource photoBrowser:self descriptionForImageAtIndex:index];
+    } else {
         self.overlayView.description = @"";
     }
+    if ([_dataSource respondsToSelector:@selector(photoBrowser:pageIndexForImageAtIndex:)]) {
+        self.overlayView.pageindex = [_dataSource photoBrowser:self pageIndexForImageAtIndex:index];
+    } else {
+        self.overlayView.pageindex = @"";
+    }
+    
 }
 
 
@@ -340,8 +346,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 - (UIButton *)doneButton
 {
 	if (!_doneButton) {
-		int currentScreenWidth = CGRectGetWidth([[UIScreen mainScreen] bounds]);
-		_doneButton = [[UIButton alloc] initWithFrame:CGRectMake(currentScreenWidth - 60 - 10, 20, 60, 32)];
+		_doneButton = [[UIButton alloc] initWithFrame:CGRectMake(10, 20, 60, 32)];
 		[_doneButton setTitle:NSLocalizedString(@"Done", @"Title for Done button") forState:UIControlStateNormal];
 		_doneButton.layer.cornerRadius = 3.0f;
 		_doneButton.layer.borderColor = [UIColor colorWithWhite:0.9 alpha:0.9].CGColor;
