@@ -38,9 +38,9 @@ static NSString *CellIdentifier = @"AGPhotoBrowserCell";
 
 @implementation AGPhotoBrowserView
 
-const int AGPhotoBrowserThresholdToCenter = 150;
+const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
-- (id)initWithFrame:(CGRect)frame
+- (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:[UIScreen mainScreen].bounds];
     if (self) {
