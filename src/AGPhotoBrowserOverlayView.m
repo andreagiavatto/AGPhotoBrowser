@@ -52,7 +52,16 @@
 	self.separatorView.frame = CGRectMake(20, CGRectGetMinY(self.titleLabel.frame) + CGRectGetHeight(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), 1);
     
 	if (self.descriptionExpanded) {
-		CGSize descriptionSize = [_description sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 40, MAXFLOAT)];
+		CGSize descriptionSize;
+		if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
+			descriptionSize = [_description sizeWithFont:self.descriptionLabel.font  constrainedToSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 40, MAXFLOAT)];
+		} else {
+			NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
+			CGRect descriptionBoundingRect = [_description boundingRectWithSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 40, MAXFLOAT)
+																					  options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
+																					  context:nil];
+			descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
+		}
 		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 280, descriptionSize.height);
 	} else {
 		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 220, 20);
@@ -60,7 +69,16 @@
 	}
     
 	if ([self.descriptionLabel.text length]) {
-        CGSize descriptionSize = [self.descriptionLabel.text sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(self.descriptionLabel.frame.size.width, MAXFLOAT)];
+		CGSize descriptionSize;
+		if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
+			descriptionSize = [self.descriptionLabel.text sizeWithFont:self.descriptionLabel.font  constrainedToSize:CGSizeMake(self.descriptionLabel.frame.size.width, MAXFLOAT)];
+		} else {
+			NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
+			CGRect descriptionBoundingRect = [self.descriptionLabel.text boundingRectWithSize:CGSizeMake(self.descriptionLabel.frame.size.width, MAXFLOAT)
+																				   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
+																				   context:nil];
+			descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
+		}
         if (descriptionSize.height > self.descriptionLabel.frame.size.height) {
             self.seeMoreButton.hidden = NO;
         } else {
@@ -136,14 +154,14 @@
 
 #pragma mark - Buttons
 
-- (void)_actionButtonTapped:(UIButton *)sender
+- (void)p_actionButtonTapped:(UIButton *)sender
 {
 	if ([_delegate respondsToSelector:@selector(sharingView:didTapOnActionButton:)]) {
 		[_delegate sharingView:self didTapOnActionButton:sender];
 	}
 }
 
-- (void)_seeMoreButtonTapped:(UIButton *)sender
+- (void)p_seeMoreButtonTapped:(UIButton *)sender
 {
 	if ([_delegate respondsToSelector:@selector(sharingView:didTapOnSeeMoreButton:)]) {
 		[_delegate sharingView:self didTapOnSeeMoreButton:sender];
@@ -156,7 +174,7 @@
 
 #pragma mark - Recognizers
 
-- (void)_tapGestureTapped:(UITapGestureRecognizer *)recognizer
+- (void)p_tapGestureTapped:(UITapGestureRecognizer *)recognizer
 {
 	[self resetOverlayView];
 }
@@ -272,7 +290,7 @@
 		_seeMoreButton.titleLabel.font = [UIFont boldSystemFontOfSize:13];
         _seeMoreButton.hidden = YES;
 		
-		[_seeMoreButton addTarget:self action:@selector(_seeMoreButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+		[_seeMoreButton addTarget:self action:@selector(p_seeMoreButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 	}
 	
 	return _seeMoreButton;
@@ -288,7 +306,7 @@
 		[_actionButton setTitleColor:[UIColor colorWithWhite:0.9 alpha:0.9] forState:UIControlStateHighlighted];
 		[_actionButton.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0f]];
         
-		[_actionButton addTarget:self action:@selector(_actionButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+		[_actionButton addTarget:self action:@selector(p_actionButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 	}
 	
 	return _actionButton;
@@ -297,7 +315,7 @@
 - (UITapGestureRecognizer *)tapGesture
 {
 	if (!_tapGesture) {
-		_tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_tapGestureTapped:)];
+		_tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(p_tapGestureTapped:)];
 		_tapGesture.numberOfTouchesRequired = 1;
 	}
 	

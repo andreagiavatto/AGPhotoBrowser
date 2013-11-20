@@ -99,7 +99,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 		imageView = [[UIImageView alloc] initWithFrame:self.bounds];
 		imageView.userInteractionEnabled = YES;
 		
-		UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_imageViewPanned:)];
+		UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(p_imageViewPanned:)];
 		panGesture.delegate = self;
 		panGesture.maximumNumberOfTouches = 1;
 		panGesture.minimumNumberOfTouches = 1;
@@ -225,7 +225,16 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)sharingView:(AGPhotoBrowserOverlayView *)sharingView didTapOnSeeMoreButton:(UIButton *)actionButton
 {
-	CGSize descriptionSize = [sharingView.description sizeWithFont:sharingView.descriptionLabel.font constrainedToSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 40, MAXFLOAT)];
+	CGSize descriptionSize;
+	if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
+		descriptionSize = [sharingView.description sizeWithFont:sharingView.descriptionLabel.font constrainedToSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 40, MAXFLOAT)];
+	} else {
+		NSDictionary *textAttributes = @{NSFontAttributeName : sharingView.descriptionLabel.font};
+		CGRect descriptionBoundingRect = [sharingView.description boundingRectWithSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 40, MAXFLOAT)
+																			   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
+																			   context:nil];
+		descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
+	}
 	
 	CGRect currentOverlayFrame = self.overlayView.frame;
 	int newSharingHeight = CGRectGetHeight(currentOverlayFrame) -20 + ceil(descriptionSize.height);
@@ -255,7 +264,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 #pragma mark - Recognizers
 
-- (void)_imageViewPanned:(UIPanGestureRecognizer *)recognizer
+- (void)p_imageViewPanned:(UIPanGestureRecognizer *)recognizer
 {
 	UIImageView *imageView = (UIImageView *)recognizer.view;
 	
@@ -352,7 +361,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 		[_doneButton.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0f]];
 		_doneButton.alpha = 0.;
 		
-		[_doneButton addTarget:self action:@selector(_doneButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+		[_doneButton addTarget:self action:@selector(p_doneButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 	}
 	
 	return _doneButton;
@@ -398,7 +407,7 @@ const int AGPhotoBrowserThresholdToCenter = 150;
 
 #pragma mark - Private methods
 
-- (void)_doneButtonTapped:(UIButton *)sender
+- (void)p_doneButtonTapped:(UIButton *)sender
 {
 	if ([_delegate respondsToSelector:@selector(photoBrowser:didTapOnDoneButton:)]) {
 		self.displayingDetailedView = NO;
