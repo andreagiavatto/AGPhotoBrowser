@@ -10,10 +10,12 @@
 
 #import <QuartzCore/QuartzCore.h>
 #import "AGPhotoBrowserOverlayView.h"
+#import "AGPhotoBrowserZoomableView.h"
 
 
 @interface AGPhotoBrowserView () <
 AGPhotoBrowserOverlayViewDelegate,
+AGPhotoBrowserZoomableViewDelegate,
 UITableViewDataSource,
 UITableViewDelegate,
 UIGestureRecognizerDelegate
@@ -94,17 +96,17 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)configureCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:1];
+    AGPhotoBrowserZoomableView *imageView = (AGPhotoBrowserZoomableView *)[cell.contentView viewWithTag:1];
 	if (!imageView) {
-		imageView = [[UIImageView alloc] initWithFrame:self.bounds];
+		imageView = [[AGPhotoBrowserZoomableView alloc] initWithFrame:self.bounds];
 		imageView.userInteractionEnabled = YES;
+        imageView.zoomableDelegate = self;
 		
 		UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(p_imageViewPanned:)];
 		panGesture.delegate = self;
 		panGesture.maximumNumberOfTouches = 1;
 		panGesture.minimumNumberOfTouches = 1;
 		[imageView addGestureRecognizer:panGesture];
-		imageView.contentMode = UIViewContentModeScaleAspectFit;
 		imageView.tag = 1;
         
 		CGAffineTransform transform = CGAffineTransformMakeRotation(M_PI_2);
@@ -116,14 +118,24 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		
 		[cell.contentView addSubview:imageView];
 	}
+    else {
+        // reset to 'zoom out' state
+        [imageView setZoomScale:1.0f];
+    }
 	
-    imageView.image = [_dataSource photoBrowser:self imageAtIndex:indexPath.row];
+    [imageView setImage:[_dataSource photoBrowser:self imageAtIndex:indexPath.row]];
+
 }
 
 
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    self.displayingDetailedView = !self.isDisplayingDetailedView;
+}
+
+- (void)zoomableViewDidTouched
 {
     self.displayingDetailedView = !self.isDisplayingDetailedView;
 }
@@ -266,7 +278,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)p_imageViewPanned:(UIPanGestureRecognizer *)recognizer
 {
-	UIImageView *imageView = (UIImageView *)recognizer.view;
+	AGPhotoBrowserZoomableView *imageView = (AGPhotoBrowserZoomableView *)recognizer.view;
 	
 	if (recognizer.state == UIGestureRecognizerStateBegan) {
         // -- Show back status bar
