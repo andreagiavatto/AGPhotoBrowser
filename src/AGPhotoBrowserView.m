@@ -135,7 +135,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     self.displayingDetailedView = !self.isDisplayingDetailedView;
 }
 
-- (void)zoomableViewDidTouched
+- (void)didTapZoomableView:(AGPhotoBrowserZoomableView *)zoomableView
 {
     self.displayingDetailedView = !self.isDisplayingDetailedView;
 }

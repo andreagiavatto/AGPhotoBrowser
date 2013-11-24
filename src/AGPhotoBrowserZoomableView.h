@@ -12,7 +12,7 @@
 
 @protocol AGPhotoBrowserZoomableViewDelegate <NSObject>
 
-- (void)zoomableViewDidTouched;
+- (void)didTapZoomableView:(AGPhotoBrowserZoomableView *)zoomableView;
 
 @end
 

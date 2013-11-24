@@ -40,8 +40,8 @@
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     if (!self.dragging) {
-        if ([self.zoomableDelegate respondsToSelector:@selector(zoomableViewDidTouched)])
-            [self.zoomableDelegate zoomableViewDidTouched];
+        if ([self.zoomableDelegate respondsToSelector:@selector(didTapZoomableView:)])
+            [self.zoomableDelegate didTapZoomableView:self];
     }
 }
 
