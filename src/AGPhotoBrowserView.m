@@ -75,7 +75,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 {
 	NSInteger number = [_dataSource numberOfPhotosForPhotoBrowser:self];
     
-    if (number > 0) {
+    if (number > 0 && _currentlySelectedIndex == NSNotFound) {
         // initialize with info for the first photo in photoTable
         [self setupPhotoForIndex:0];
     }
