@@ -73,7 +73,14 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-	return [_dataSource numberOfPhotosForPhotoBrowser:self];
+	NSInteger number = [_dataSource numberOfPhotosForPhotoBrowser:self];
+    
+    if (number > 0) {
+        // initialize with info for the first photo in photoTable
+        [self setupPhotoForIndex:0];
+    }
+    
+    return number;
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -160,7 +167,12 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	
 	int index = floor(targetContentOffset.y / CGRectGetWidth(self.frame));
 	
-	_currentlySelectedIndex = index;
+	[self setupPhotoForIndex:index];
+}
+
+- (void)setupPhotoForIndex:(int)index
+{
+    _currentlySelectedIndex = index;
 	
 	if ([_dataSource respondsToSelector:@selector(photoBrowser:titleForImageAtIndex:)]) {
 		self.overlayView.title = [_dataSource photoBrowser:self titleForImageAtIndex:index];
