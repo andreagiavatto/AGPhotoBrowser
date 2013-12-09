@@ -30,3 +30,7 @@ It currently supports:
 ## Resources
 
 Info can be found on [my website](http://www.andreagiavatto.com), [and on Twitter](http://twitter.com/andreagiavatto).
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/andreagiavatto/agphotobrowser/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
