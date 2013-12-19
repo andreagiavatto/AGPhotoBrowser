@@ -15,16 +15,21 @@ It currently supports:
 ![1](https://s3-us-west-2.amazonaws.com/andreagiavatto.github.io/AGPhotoBrowser/AGPhotoBrowser.gif)
 
 ## Install
-- copy the content of the 'src' folder in your project
+The suggested way to install the component is using [CocoaPods](http://cocoapods.org/), just include the following line in your Podfile:
+`pod "AGPhotoBrowser", "~> 1.0.3"`
+
+
+## Usage
+There is a demo project included that shows how to use the photo browser.
 - import `AGPhotoBrowserView.h` in your class
-- set up the delegate and the dataSource
+- create a new instance of `AGPhotoBrowserView` and set the delegate and the dataSource
 - implement `- (NSInteger)numberOfPhotosForPhotoBrowser:(AGPhotoBrowserView *)photoBrowser` and `- (UIImage *)photoBrowser:(AGPhotoBrowserView *)photoBrowser imageAtIndex:(NSInteger)index` methods from the datasource
 - (optional) provide a title and a description for each image implementing `- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser titleForImageAtIndex:(NSInteger)index` and `- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser descriptionForImageAtIndex:(NSInteger)index`
 - show the browser calling the `- (void)show` or `- (void)showFromIndex:(NSInteger)initialIndex` methods
 - dismiss the photo browser with a completion block calling `- (void)hideWithCompletion:( void (^) (BOOL finished) )completionBlock`
 
 ## TO-DO
-- add pinch to zoom gesture on images
+- ~~add pinch to zoom gesture on images~~ (thanks @dtsolis)
 - support orientation changes
 
 ## Resources
