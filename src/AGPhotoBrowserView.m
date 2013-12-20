@@ -31,6 +31,9 @@ UIGestureRecognizerDelegate
 @property (nonatomic, strong) UITableView *photoTableView;
 @property (nonatomic, strong) AGPhotoBrowserOverlayView *overlayView;
 
+@property (nonatomic, strong) UIWindow *previousWindow;
+@property (nonatomic, strong) UIWindow *currentWindow;
+
 @property (nonatomic, assign, getter = isDisplayingDetailedView) BOOL displayingDetailedView;
 
 @end
@@ -198,7 +201,15 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)show
 {
-    [[[UIApplication sharedApplication].windows lastObject] addSubview:self];
+    self.previousWindow = [[UIApplication sharedApplication] keyWindow];
+    
+    self.currentWindow = [[UIWindow alloc] initWithFrame:self.previousWindow.bounds];
+    self.currentWindow.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+    self.currentWindow.windowLevel = UIWindowLevelStatusBar;
+    self.currentWindow.hidden = NO;
+    self.currentWindow.backgroundColor = [UIColor clearColor];
+    [self.currentWindow makeKeyAndVisible];
+    [self.currentWindow addSubview:self];
 	
 	[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
 					 animations:^(){
@@ -237,6 +248,9 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 					 completion:^(BOOL finished){
 						 self.userInteractionEnabled = NO;
                          [self removeFromSuperview];
+                         [self.previousWindow makeKeyAndVisible];
+                         self.currentWindow.hidden = YES;
+                         self.currentWindow = nil;
 						 if(completionBlock) {
 							 completionBlock(finished);
 						 }
