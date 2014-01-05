@@ -11,11 +11,12 @@
 #import <QuartzCore/QuartzCore.h>
 #import "AGPhotoBrowserOverlayView.h"
 #import "AGPhotoBrowserZoomableView.h"
+#import "AGPhotoBrowserCell.h"
 
 
 @interface AGPhotoBrowserView () <
 AGPhotoBrowserOverlayViewDelegate,
-AGPhotoBrowserZoomableViewDelegate,
+AGPhotoBrowserCellDelegate,
 UITableViewDataSource,
 UITableViewDelegate,
 UIGestureRecognizerDelegate
@@ -177,10 +178,11 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    AGPhotoBrowserCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell = [[AGPhotoBrowserCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
+		cell.delegate = self;
     }
     
     [self configureCell:cell forRowAtIndexPath:indexPath];
@@ -188,37 +190,10 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     return cell;
 }
 
-- (void)configureCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)configureCell:(AGPhotoBrowserCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    AGPhotoBrowserZoomableView *imageView = (AGPhotoBrowserZoomableView *)[cell.contentView viewWithTag:1];
-	if (!imageView) {
-		imageView = [[AGPhotoBrowserZoomableView alloc] initWithFrame:self.bounds];
-		imageView.userInteractionEnabled = YES;
-        imageView.zoomableDelegate = self;
-		
-		UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(p_imageViewPanned:)];
-		panGesture.delegate = self;
-		panGesture.maximumNumberOfTouches = 1;
-		panGesture.minimumNumberOfTouches = 1;
-		[imageView addGestureRecognizer:panGesture];
-		imageView.tag = 1;
-        
-		CGAffineTransform transform = CGAffineTransformMakeRotation(M_PI_2);
-		CGPoint origin = imageView.frame.origin;
-		imageView.transform = transform;
-        CGRect frame = imageView.frame;
-        frame.origin = origin;
-        imageView.frame = frame;
-		
-		[cell.contentView addSubview:imageView];
-	}
-    else {
-        // reset to 'zoom out' state
-        [imageView setZoomScale:1.0f];
-    }
-	
-    [imageView setImage:[_dataSource photoBrowser:self imageAtIndex:indexPath.row]];
-
+	[cell resetZoomScale];
+    [cell setZoomableImage:[_dataSource photoBrowser:self imageAtIndex:indexPath.row]];
 }
 
 
@@ -229,9 +204,17 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     self.displayingDetailedView = !self.isDisplayingDetailedView;
 }
 
-- (void)didTapZoomableView:(AGPhotoBrowserZoomableView *)zoomableView
+
+#pragma mark - AGPhotoBrowserCellDelegate
+
+- (void)didPanOnZoomableViewForCell:(AGPhotoBrowserCell *)cell withRecognizer:(UIPanGestureRecognizer *)recognizer
 {
-    self.displayingDetailedView = !self.isDisplayingDetailedView;
+	[self p_imageViewPanned:recognizer];
+}
+
+- (void)didDoubleTapOnZoomableViewForCell:(AGPhotoBrowserCell *)cell
+{
+	self.displayingDetailedView = !self.isDisplayingDetailedView;
 }
 
 
@@ -298,8 +281,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
 					 animations:^(){
 						 self.backgroundColor = [UIColor colorWithWhite:0. alpha:1.];
-						 
-						 [[UIApplication sharedApplication] setStatusBarHidden:YES];
 					 }
 					 completion:^(BOOL finished){
 						 if (finished) {
@@ -326,8 +307,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 					 animations:^(){
 						 self.photoTableView.alpha = 0.;
 						 self.backgroundColor = [UIColor colorWithWhite:0. alpha:0.];
-						 
-						 [[UIApplication sharedApplication] setStatusBarHidden:NO];
 					 }
 					 completion:^(BOOL finished){
 						 self.userInteractionEnabled = NO;
@@ -374,22 +353,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 }
 
 
-#pragma mark - UIGestureRecognizerDelegate
-
-- (BOOL)gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)gestureRecognizer
-{
-    UIView *imageView = [gestureRecognizer view];
-    CGPoint translation = [gestureRecognizer translationInView:[imageView superview]];
-	
-    // -- Check for horizontal gesture
-    if (fabsf(translation.x) > fabsf(translation.y)) {
-        return YES;
-	}
-	
-    return NO;
-}
-
-
 #pragma mark - Recognizers
 
 - (void)p_imageViewPanned:(UIPanGestureRecognizer *)recognizer
@@ -397,8 +360,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	AGPhotoBrowserZoomableView *imageView = (AGPhotoBrowserZoomableView *)recognizer.view;
 	
 	if (recognizer.state == UIGestureRecognizerStateBegan) {
-        // -- Show back status bar
-        [[UIApplication sharedApplication] setStatusBarHidden:NO];
 		// -- Disable table view scrolling
 		self.photoTableView.scrollEnabled = NO;
 		// -- Hide detailed view
@@ -423,8 +384,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 								 self.backgroundColor = [UIColor colorWithWhite:0. alpha:1.];
 								 imageView.center = self->_startingPanPoint;
 							 } completion:^(BOOL finished){
-                                 // -- Hide status bar
-                                 [[UIApplication sharedApplication] setStatusBarHidden:YES];
 								 // -- show detailed view?
 								 self.displayingDetailedView = YES;
 							 }];

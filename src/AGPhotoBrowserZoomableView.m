@@ -17,6 +17,7 @@
         self.delegate = self;
         self.imageView = [[UIImageView alloc] initWithFrame:frame];
         self.imageView.contentMode = UIViewContentModeScaleAspectFit;
+		self.imageView.translatesAutoresizingMaskIntoConstraints = NO;
         self.frame = frame;
         
         self.minimumZoomScale = 1.0f;
@@ -32,18 +33,45 @@
     return self;
 }
 
+- (void)updateConstraints
+{
+	[self removeConstraints:self.constraints];
+	
+	NSDictionary *constrainedViews = NSDictionaryOfVariableBindings(_imageView);
+	
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_imageView]|"
+																 options:0
+																 metrics:@{}
+																   views:constrainedViews]];
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_imageView]|"
+																 options:0
+																 metrics:@{}
+																   views:constrainedViews]];
+	
+	[super updateConstraints];
+}
+
+
+#pragma mark - Public methods
+
 - (void)setImage:(UIImage *)image
 {
     self.imageView.image = image;
 }
 
+
+#pragma mark - Touch handling
+
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     if (!self.dragging) {
-        if ([self.zoomableDelegate respondsToSelector:@selector(didTapZoomableView:)])
-            [self.zoomableDelegate didTapZoomableView:self];
+        if ([self.zoomableDelegate respondsToSelector:@selector(didDoubleTapZoomableView:)])
+            [self.zoomableDelegate didDoubleTapZoomableView:self];
     }
 }
+
+
+#pragma mark - Recognizer
 
 - (void)doubleTapped:(UITapGestureRecognizer *)recognizer
 {
@@ -60,7 +88,8 @@
     }
 }
 
-#pragma mark - UIScrollViewDelegates
+#pragma mark - UIScrollViewDelegate
+
 - (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
 {
 }
