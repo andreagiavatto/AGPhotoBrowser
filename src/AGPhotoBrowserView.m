@@ -422,7 +422,16 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		}
 	} else {
 		CGPoint middlePanPoint = [recognizer translationInView:self];
-		CGPoint translatedPoint = CGPointMake(_startingPanPoint.x - middlePanPoint.y, _startingPanPoint.y);
+		
+		UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+		CGPoint translatedPoint;
+		
+		if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
+			translatedPoint = CGPointMake(_startingPanPoint.x + middlePanPoint.x, _startingPanPoint.y);
+		} else {
+			translatedPoint = CGPointMake(_startingPanPoint.x - middlePanPoint.y, _startingPanPoint.y);
+		}
+		
 		imageView.center = translatedPoint;
 		int heightDifference = abs(floor(_startingPanPoint.x - translatedPoint.x));
 		CGFloat ratio = (_startingPanPoint.x - heightDifference)/_startingPanPoint.x;
