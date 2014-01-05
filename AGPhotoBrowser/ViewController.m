@@ -183,7 +183,7 @@
 - (AGPhotoBrowserView *)browserView
 {
 	if (!_browserView) {
-		_browserView = [[AGPhotoBrowserView alloc] initWithFrame:self.view.bounds];
+		_browserView = [[AGPhotoBrowserView alloc] initWithFrame:CGRectZero];
 		_browserView.delegate = self;
 		_browserView.dataSource = self;
 	}
