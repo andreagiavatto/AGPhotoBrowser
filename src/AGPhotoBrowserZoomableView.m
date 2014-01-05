@@ -14,6 +14,7 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
+		self.translatesAutoresizingMaskIntoConstraints = NO;
         self.delegate = self;
         self.imageView = [[UIImageView alloc] initWithFrame:frame];
         self.imageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -47,6 +48,18 @@
 																 options:0
 																 metrics:@{}
 																   views:constrainedViews]];
+	[self addConstraint:[NSLayoutConstraint constraintWithItem:_imageView
+													attribute:NSLayoutAttributeCenterX
+													relatedBy:NSLayoutRelationEqual
+													   toItem:_imageView.superview
+													attribute:NSLayoutAttributeCenterX
+												   multiplier:1.f constant:0.f]];
+	[self addConstraint:[NSLayoutConstraint constraintWithItem:_imageView
+													 attribute:NSLayoutAttributeCenterY
+													 relatedBy:NSLayoutRelationEqual
+														toItem:_imageView.superview
+													 attribute:NSLayoutAttributeCenterY
+													multiplier:1.f constant:0.f]];
 	
 	[super updateConstraints];
 }
@@ -57,6 +70,8 @@
 - (void)setImage:(UIImage *)image
 {
     self.imageView.image = image;
+	
+	[self updateConstraints];
 }
 
 

@@ -21,6 +21,7 @@
 {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
+		//self.contentView.translatesAutoresizingMaskIntoConstraints = NO;
 		//self.contentView.autoresizingMask = UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth;
 		[self setupCell];
 	}
@@ -99,6 +100,8 @@
 	if (_zoomableImage) {
 		[self.zoomableView setImage:_zoomableImage];
 	}
+	
+	[self updateConstraints];
 }
 
 
