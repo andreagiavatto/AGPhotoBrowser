@@ -11,11 +11,12 @@
 #import <QuartzCore/QuartzCore.h>
 #import "AGPhotoBrowserOverlayView.h"
 #import "AGPhotoBrowserZoomableView.h"
-
+#import "AGPhotoBrowserCell.h"
+#import "AGPhotoBrowserCellProtocol.h"
 
 @interface AGPhotoBrowserView () <
 AGPhotoBrowserOverlayViewDelegate,
-AGPhotoBrowserZoomableViewDelegate,
+AGPhotoBrowserCellDelegate,
 UITableViewDataSource,
 UITableViewDelegate,
 UIGestureRecognizerDelegate
@@ -30,6 +31,11 @@ UIGestureRecognizerDelegate
 @property (nonatomic, strong, readwrite) UIButton *doneButton;
 @property (nonatomic, strong) UITableView *photoTableView;
 @property (nonatomic, strong) AGPhotoBrowserOverlayView *overlayView;
+
+@property (nonatomic, strong) UIWindow *previousWindow;
+@property (nonatomic, strong) UIWindow *currentWindow;
+
+@property (nonatomic, assign, readonly) CGFloat cellHeight;
 
 @property (nonatomic, assign, getter = isDisplayingDetailedView) BOOL displayingDetailedView;
 
@@ -64,11 +70,105 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 }
 
 
+#pragma mark - Getters
+
+- (UIButton *)doneButton
+{
+	if (!_doneButton) {
+		int currentScreenWidth = CGRectGetWidth([[UIScreen mainScreen] bounds]);
+		_doneButton = [[UIButton alloc] initWithFrame:CGRectMake(currentScreenWidth - 60 - 10, 20, 60, 32)];
+		[_doneButton setTitle:NSLocalizedString(@"Done", @"Title for Done button") forState:UIControlStateNormal];
+		_doneButton.layer.cornerRadius = 3.0f;
+		_doneButton.layer.borderColor = [UIColor colorWithWhite:0.9 alpha:0.9].CGColor;
+		_doneButton.layer.borderWidth = 1.0f;
+		[_doneButton setBackgroundColor:[UIColor colorWithWhite:0.1 alpha:0.5]];
+		[_doneButton setTitleColor:[UIColor colorWithWhite:0.9 alpha:0.9] forState:UIControlStateNormal];
+		[_doneButton setTitleColor:[UIColor colorWithWhite:0.9 alpha:0.9] forState:UIControlStateHighlighted];
+		[_doneButton.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0f]];
+		_doneButton.alpha = 0.;
+		
+		[_doneButton addTarget:self action:@selector(p_doneButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+	}
+	
+	return _doneButton;
+}
+
+- (UITableView *)photoTableView
+{
+	if (!_photoTableView) {
+		CGRect screenBounds = [[UIScreen mainScreen] bounds];
+		_photoTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetHeight(screenBounds), CGRectGetWidth(screenBounds))];
+		_photoTableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+		_photoTableView.dataSource = self;
+		_photoTableView.delegate = self;
+		_photoTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+		_photoTableView.backgroundColor = [UIColor clearColor];
+		_photoTableView.pagingEnabled = YES;
+		_photoTableView.showsVerticalScrollIndicator = NO;
+		_photoTableView.showsHorizontalScrollIndicator = NO;
+		_photoTableView.alpha = 0.;
+		
+		// -- Rotate table horizontally
+		CGAffineTransform rotateTable = CGAffineTransformMakeRotation(-M_PI_2);
+		CGPoint origin = _photoTableView.frame.origin;
+		_photoTableView.transform = rotateTable;
+		CGRect frame = _photoTableView.frame;
+		frame.origin = origin;
+		_photoTableView.frame = frame;
+	}
+	
+	return _photoTableView;
+}
+
+- (AGPhotoBrowserOverlayView *)overlayView
+{
+	if (!_overlayView) {
+		_overlayView = [[AGPhotoBrowserOverlayView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.frame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(self.frame), AGPhotoBrowserOverlayInitialHeight)];
+		_overlayView.delegate = self;
+	}
+	
+	return _overlayView;
+}
+
+- (CGFloat)cellHeight
+{
+    return CGRectGetWidth([UIScreen mainScreen].bounds);
+}
+
+
+#pragma mark - Setters
+
+- (void)setDisplayingDetailedView:(BOOL)displayingDetailedView
+{
+	_displayingDetailedView = displayingDetailedView;
+	
+	CGFloat newAlpha;
+	
+	if (_displayingDetailedView) {
+		[self.overlayView showOverlayAnimated:YES];
+		newAlpha = 1.;
+	} else {
+		[self.overlayView hideOverlayAnimated:YES];
+		newAlpha = 0.;
+	}
+	
+	[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
+					 animations:^(){
+						 self.doneButton.alpha = newAlpha;
+					 }];
+}
+
+
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return 1;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	return self.cellHeight;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -90,10 +190,15 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    UITableViewCell<AGPhotoBrowserCellProtocol> *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        if ([_dataSource respondsToSelector:@selector(cellForBrowser:withReuseIdentifier:)]) {
+            cell = [_dataSource cellForBrowser:self withReuseIdentifier:CellIdentifier];
+        } else {
+            cell = [[AGPhotoBrowserCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        }
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
+		cell.delegate = self;
     }
     
     [self configureCell:cell forRowAtIndexPath:indexPath];
@@ -101,37 +206,21 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     return cell;
 }
 
-- (void)configureCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)configureCell:(UITableViewCell<AGPhotoBrowserCellProtocol> *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    AGPhotoBrowserZoomableView *imageView = (AGPhotoBrowserZoomableView *)[cell.contentView viewWithTag:1];
-	if (!imageView) {
-		imageView = [[AGPhotoBrowserZoomableView alloc] initWithFrame:self.bounds];
-		imageView.userInteractionEnabled = YES;
-        imageView.zoomableDelegate = self;
-		
-		UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(p_imageViewPanned:)];
-		panGesture.delegate = self;
-		panGesture.maximumNumberOfTouches = 1;
-		panGesture.minimumNumberOfTouches = 1;
-		[imageView addGestureRecognizer:panGesture];
-		imageView.tag = 1;
-        
-		CGAffineTransform transform = CGAffineTransformMakeRotation(M_PI_2);
-		CGPoint origin = imageView.frame.origin;
-		imageView.transform = transform;
-        CGRect frame = imageView.frame;
-        frame.origin = origin;
-        imageView.frame = frame;
-		
-		[cell.contentView addSubview:imageView];
-	}
-    else {
-        // reset to 'zoom out' state
-        [imageView setZoomScale:1.0f];
+    CGRect cellFrame = cell.frame;
+    cellFrame.size.width = self.cellHeight;
+    cell.frame = cellFrame;
+    
+    if ([cell respondsToSelector:@selector(resetZoomScale)]) {
+        [cell resetZoomScale];
     }
-	
-    [imageView setImage:[_dataSource photoBrowser:self imageAtIndex:indexPath.row]];
-
+    
+    if ([_dataSource respondsToSelector:@selector(photoBrowser:URLStringForImageAtIndex:)] && [cell respondsToSelector:@selector(setCellImageWithURL:)]) {
+        [cell setCellImageWithURL:[NSURL URLWithString:[_dataSource photoBrowser:self URLStringForImageAtIndex:indexPath.row]]];
+    } else {
+        [cell setCellImage:[_dataSource photoBrowser:self imageAtIndex:indexPath.row]];
+    }
 }
 
 
@@ -142,9 +231,17 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     self.displayingDetailedView = !self.isDisplayingDetailedView;
 }
 
-- (void)didTapZoomableView:(AGPhotoBrowserZoomableView *)zoomableView
+
+#pragma mark - AGPhotoBrowserCellDelegate
+
+- (void)didPanOnZoomableViewForCell:(id<AGPhotoBrowserCellProtocol>)cell withRecognizer:(UIPanGestureRecognizer *)recognizer
 {
-    self.displayingDetailedView = !self.isDisplayingDetailedView;
+	[self p_imageViewPanned:recognizer];
+}
+
+- (void)didDoubleTapOnZoomableViewForCell:(id<AGPhotoBrowserCellProtocol>)cell
+{
+	self.displayingDetailedView = !self.isDisplayingDetailedView;
 }
 
 
@@ -165,7 +262,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 										  ];
 	targetContentOffset.y = rectForTopRowAfterScrolling.origin.y;
 	
-	int index = floor(targetContentOffset.y / CGRectGetWidth(self.frame));
+	int index = floor(targetContentOffset.y / self.cellHeight);
 	
     if ([self.dataSource respondsToSelector:@selector(photoBrowser:willDisplayActionButtonAtIndex:)]) {
         self.overlayView.actionButton.hidden = [self.dataSource photoBrowser:self willDisplayActionButtonAtIndex:index];
@@ -198,13 +295,19 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)show
 {
-    [[[UIApplication sharedApplication].windows lastObject] addSubview:self];
+    self.previousWindow = [[UIApplication sharedApplication] keyWindow];
+    
+    self.currentWindow = [[UIWindow alloc] initWithFrame:self.previousWindow.bounds];
+    //self.currentWindow.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+    self.currentWindow.windowLevel = UIWindowLevelStatusBar;
+    self.currentWindow.hidden = NO;
+    self.currentWindow.backgroundColor = [UIColor clearColor];
+    [self.currentWindow makeKeyAndVisible];
+    [self.currentWindow addSubview:self];
 	
 	[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
 					 animations:^(){
 						 self.backgroundColor = [UIColor colorWithWhite:0. alpha:1.];
-						 
-						 [[UIApplication sharedApplication] setStatusBarHidden:YES];
 					 }
 					 completion:^(BOOL finished){
 						 if (finished) {
@@ -231,12 +334,13 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 					 animations:^(){
 						 self.photoTableView.alpha = 0.;
 						 self.backgroundColor = [UIColor colorWithWhite:0. alpha:0.];
-						 
-						 [[UIApplication sharedApplication] setStatusBarHidden:NO];
 					 }
 					 completion:^(BOOL finished){
 						 self.userInteractionEnabled = NO;
                          [self removeFromSuperview];
+                         [self.previousWindow makeKeyAndVisible];
+                         self.currentWindow.hidden = YES;
+                         self.currentWindow = nil;
 						 if(completionBlock) {
 							 completionBlock(finished);
 						 }
@@ -276,22 +380,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 }
 
 
-#pragma mark - UIGestureRecognizerDelegate
-
-- (BOOL)gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)gestureRecognizer
-{
-    UIView *imageView = [gestureRecognizer view];
-    CGPoint translation = [gestureRecognizer translationInView:[imageView superview]];
-	
-    // -- Check for horizontal gesture
-    if (fabsf(translation.x) > fabsf(translation.y)) {
-        return YES;
-	}
-	
-    return NO;
-}
-
-
 #pragma mark - Recognizers
 
 - (void)p_imageViewPanned:(UIPanGestureRecognizer *)recognizer
@@ -299,8 +387,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	AGPhotoBrowserZoomableView *imageView = (AGPhotoBrowserZoomableView *)recognizer.view;
 	
 	if (recognizer.state == UIGestureRecognizerStateBegan) {
-        // -- Show back status bar
-        [[UIApplication sharedApplication] setStatusBarHidden:NO];
 		// -- Disable table view scrolling
 		self.photoTableView.scrollEnabled = NO;
 		// -- Hide detailed view
@@ -325,8 +411,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 								 self.backgroundColor = [UIColor colorWithWhite:0. alpha:1.];
 								 imageView.center = self->_startingPanPoint;
 							 } completion:^(BOOL finished){
-                                 // -- Hide status bar
-                                 [[UIApplication sharedApplication] setStatusBarHidden:YES];
 								 // -- show detailed view?
 								 self.displayingDetailedView = YES;
 							 }];
@@ -342,96 +426,21 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		}
 	} else {
 		CGPoint middlePanPoint = [recognizer translationInView:self];
-		CGPoint translatedPoint = CGPointMake(_startingPanPoint.x - middlePanPoint.y, _startingPanPoint.y);
+		
+		UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+		CGPoint translatedPoint;
+		
+		if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
+			translatedPoint = CGPointMake(_startingPanPoint.x + middlePanPoint.x, _startingPanPoint.y);
+		} else {
+			translatedPoint = CGPointMake(_startingPanPoint.x - middlePanPoint.y, _startingPanPoint.y);
+		}
+		
 		imageView.center = translatedPoint;
 		int heightDifference = abs(floor(_startingPanPoint.x - translatedPoint.x));
 		CGFloat ratio = (_startingPanPoint.x - heightDifference)/_startingPanPoint.x;
 		self.backgroundColor = [UIColor colorWithWhite:0. alpha:ratio];
 	}
-}
-
-
-#pragma mark - Setters
-
-- (void)setDisplayingDetailedView:(BOOL)displayingDetailedView
-{
-	_displayingDetailedView = displayingDetailedView;
-	
-	CGFloat newAlpha;
-	
-	if (_displayingDetailedView) {
-		[self.overlayView showOverlayAnimated:YES];
-		newAlpha = 1.;
-	} else {
-		[self.overlayView hideOverlayAnimated:YES];
-		newAlpha = 0.;
-	}
-	
-	[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
-					 animations:^(){
-						 self.doneButton.alpha = newAlpha;
-					 }];
-}
-
-
-#pragma mark - Getters
-
-- (UIButton *)doneButton
-{
-	if (!_doneButton) {
-		int currentScreenWidth = CGRectGetWidth([[UIScreen mainScreen] bounds]);
-		_doneButton = [[UIButton alloc] initWithFrame:CGRectMake(currentScreenWidth - 60 - 10, 20, 60, 32)];
-		[_doneButton setTitle:NSLocalizedString(@"Done", @"Title for Done button") forState:UIControlStateNormal];
-		_doneButton.layer.cornerRadius = 3.0f;
-		_doneButton.layer.borderColor = [UIColor colorWithWhite:0.9 alpha:0.9].CGColor;
-		_doneButton.layer.borderWidth = 1.0f;
-		[_doneButton setBackgroundColor:[UIColor colorWithWhite:0.1 alpha:0.5]];
-		[_doneButton setTitleColor:[UIColor colorWithWhite:0.9 alpha:0.9] forState:UIControlStateNormal];
-		[_doneButton setTitleColor:[UIColor colorWithWhite:0.9 alpha:0.9] forState:UIControlStateHighlighted];
-		[_doneButton.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0f]];
-		_doneButton.alpha = 0.;
-		
-		[_doneButton addTarget:self action:@selector(p_doneButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-	}
-	
-	return _doneButton;
-}
-
-- (UITableView *)photoTableView
-{
-	if (!_photoTableView) {
-		CGRect screenBounds = [[UIScreen mainScreen] bounds];
-		_photoTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetHeight(screenBounds), CGRectGetWidth(screenBounds))];
-		_photoTableView.dataSource = self;
-		_photoTableView.delegate = self;
-		_photoTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-		_photoTableView.backgroundColor = [UIColor clearColor];
-		_photoTableView.rowHeight = screenBounds.size.width;
-		_photoTableView.pagingEnabled = YES;
-		_photoTableView.showsVerticalScrollIndicator = NO;
-		_photoTableView.showsHorizontalScrollIndicator = NO;
-		_photoTableView.alpha = 0.;
-		
-		// -- Rotate table horizontally
-		CGAffineTransform rotateTable = CGAffineTransformMakeRotation(-M_PI_2);
-		CGPoint origin = _photoTableView.frame.origin;
-		_photoTableView.transform = rotateTable;
-		CGRect frame = _photoTableView.frame;
-		frame.origin = origin;
-		_photoTableView.frame = frame;
-	}
-	
-	return _photoTableView;
-}
-
-- (AGPhotoBrowserOverlayView *)overlayView
-{
-	if (!_overlayView) {
-		_overlayView = [[AGPhotoBrowserOverlayView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.frame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(self.frame), AGPhotoBrowserOverlayInitialHeight)];
-		_overlayView.delegate = self;
-	}
-	
-	return _overlayView;
 }
 
 
@@ -445,5 +454,59 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	}
 }
 
+/*
+#pragma mark - Orientation change
+
+- (void)statusBarDidChangeFrame:(NSNotification *)notification
+{
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    CGFloat angle = UIInterfaceOrientationAngleOfOrientation(orientation);
+    CGAffineTransform viewTransform = CGAffineTransformMakeRotation(angle);
+    CGRect frame = [UIScreen mainScreen].bounds;
+	[self setTableIfNotEqualTransform:viewTransform frame:frame];
+    [self.photoTableView reloadData];
+}
+
+- (void)setIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame
+{
+    if (!CGAffineTransformEqualToTransform(self.transform, transform)) {
+        self.transform = transform;
+    }
+    if (!CGRectEqualToRect(self.frame, frame)) {
+        self.frame = frame;
+    }
+}
+
+- (void)setTableIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame
+{
+    if(!CGAffineTransformEqualToTransform(self.photoTableView.transform, transform)) {
+        self.photoTableView.transform = transform;
+    }
+	if (!CGRectEqualToRect(self.photoTableView.frame, frame)) {
+        self.photoTableView.frame = frame;
+    }
+}
+
+CGFloat UIInterfaceOrientationAngleOfOrientation(UIDeviceOrientation orientation)
+{
+    CGFloat angle;
+    
+    switch (orientation) {
+        case UIDeviceOrientationPortraitUpsideDown:
+            angle = -M_PI_2;
+            break;
+        case UIDeviceOrientationLandscapeLeft:
+            angle = 0;
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            angle = M_PI;
+            break;
+        default:
+            angle = -M_PI_2;
+            break;
+    }
+    
+    return angle;
+}*/
 
 @end

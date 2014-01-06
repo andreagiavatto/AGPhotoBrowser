@@ -10,7 +10,6 @@
 
 #import "AGPhotoBrowserView.h"
 
-
 #define SAMPLE_IMAGE_1			[UIImage imageNamed:@"sample1.jpg"]
 #define SAMPLE_IMAGE_2			[UIImage imageNamed:@"sample2.jpg"]
 #define SAMPLE_IMAGE_3			[UIImage imageNamed:@"sample3.jpg"]
@@ -183,7 +182,7 @@
 - (AGPhotoBrowserView *)browserView
 {
 	if (!_browserView) {
-		_browserView = [[AGPhotoBrowserView alloc] initWithFrame:self.view.bounds];
+		_browserView = [[AGPhotoBrowserView alloc] initWithFrame:CGRectZero];
 		_browserView.delegate = self;
 		_browserView.dataSource = self;
 	}
