@@ -259,12 +259,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	targetContentOffset.y = rectForTopRowAfterScrolling.origin.y;
 	
 	int index = floor(targetContentOffset.y / self.cellHeight);
-	
-    if ([self.dataSource respondsToSelector:@selector(photoBrowser:willDisplayActionButtonAtIndex:)]) {
-        self.overlayView.actionButton.hidden = ![self.dataSource photoBrowser:self willDisplayActionButtonAtIndex:index];
-    } else {
-        self.overlayView.actionButton.hidden = NO;
-    }
     
 	[self setupPhotoForIndex:index];
 }
@@ -273,6 +267,12 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 {
     _currentlySelectedIndex = index;
 	
+    if ([self.dataSource respondsToSelector:@selector(photoBrowser:willDisplayActionButtonAtIndex:)]) {
+        self.overlayView.actionButton.hidden = ![self.dataSource photoBrowser:self willDisplayActionButtonAtIndex:index];
+    } else {
+        self.overlayView.actionButton.hidden = NO;
+    }
+    
 	if ([_dataSource respondsToSelector:@selector(photoBrowser:titleForImageAtIndex:)]) {
 		self.overlayView.title = [_dataSource photoBrowser:self titleForImageAtIndex:index];
 	} else {
