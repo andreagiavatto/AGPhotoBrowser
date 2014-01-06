@@ -8,13 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-#import "AGPhotoBrowserCellDelegate.h"
+#import "AGPhotoBrowserCellProtocol.h"
 
-@interface AGPhotoBrowserCell : UITableViewCell
+@interface AGPhotoBrowserCell : UITableViewCell <AGPhotoBrowserCellProtocol>
 
 @property (nonatomic, weak) id<AGPhotoBrowserCellDelegate> delegate;
-@property (nonatomic, strong) UIImage *zoomableImage;
 
+- (void)setZoomableImage:(UIImage *)zoomableImage;
 - (void)resetZoomScale;
 
 @end

@@ -26,7 +26,7 @@
 	
 	return self;
 }
-
+/*
 - (void)updateConstraints
 {
 	[self.contentView removeConstraints:self.contentView.constraints];
@@ -43,7 +43,7 @@
 																			   views:constrainedViews]];
 	
 	[super updateConstraints];
-}
+}*/
 
 #pragma mark - Getters
 
@@ -93,13 +93,11 @@
 
 - (void)setZoomableImage:(UIImage *)zoomableImage
 {
-	_zoomableImage = zoomableImage;
-	
-	if (_zoomableImage) {
-		[self.zoomableView setImage:_zoomableImage];
+	if (zoomableImage) {
+		[self.zoomableView setImage:zoomableImage];
 	}
 	
-	[self updateConstraints];
+	//[self updateConstraints];
 }
 
 

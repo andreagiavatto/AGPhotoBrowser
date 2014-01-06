@@ -12,7 +12,7 @@
 #import "AGPhotoBrowserOverlayView.h"
 #import "AGPhotoBrowserZoomableView.h"
 #import "AGPhotoBrowserCell.h"
-
+#import "AGPhotoBrowserCellProtocol.h"
 
 @interface AGPhotoBrowserView () <
 AGPhotoBrowserOverlayViewDelegate,
@@ -67,11 +67,11 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	[self addSubview:self.photoTableView];
 	[self addSubview:self.doneButton];
 	[self addSubview:self.overlayView];
-	
+	/*
 	[[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(statusBarDidChangeFrame:)
                                                  name:UIDeviceOrientationDidChangeNotification
-                                               object:nil];
+                                               object:nil];*/
 }
 
 
@@ -137,7 +137,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (CGFloat)cellHeight
 {
-    NSLog(@"Current window frame %@", NSStringFromCGRect(self.currentWindow.frame));
+    /*NSLog(@"Current window frame %@", NSStringFromCGRect(self.currentWindow.frame));
 	UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
     NSLog(@"Orientation %d", orientation);
 	if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
@@ -146,7 +146,9 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	}
     NSLog(@"PORTRAIT");
 	
-	return CGRectGetWidth(self.currentWindow.frame);
+	return CGRectGetWidth(self.currentWindow.frame);*/
+    
+    return CGRectGetWidth([UIScreen mainScreen].bounds);
 }
 
 
@@ -204,9 +206,13 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    AGPhotoBrowserCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    UITableViewCell<AGPhotoBrowserCellProtocol> *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
-        cell = [[AGPhotoBrowserCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        if ([_dataSource respondsToSelector:@selector(cellForBrowser:withReuseIdentifier:)]) {
+            cell = [_dataSource cellForBrowser:self withReuseIdentifier:CellIdentifier];
+        } else {
+            cell = [[AGPhotoBrowserCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        }
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
 		cell.delegate = self;
     }
@@ -216,13 +222,18 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     return cell;
 }
 
-- (void)configureCell:(AGPhotoBrowserCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)configureCell:(UITableViewCell<AGPhotoBrowserCellProtocol> *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     CGRect cellFrame = cell.frame;
     cellFrame.size.width = self.cellHeight;
     cell.frame = cellFrame;
 	[cell resetZoomScale];
-    [cell setZoomableImage:[_dataSource photoBrowser:self imageAtIndex:indexPath.row]];
+    
+    if ([_dataSource respondsToSelector:@selector(photoBrowser:URLStringForImageAtIndex:)] && [cell respondsToSelector:@selector(setZoomableImageWithURL:)]) {
+        [cell setZoomableImageWithURL:[NSURL URLWithString:[_dataSource photoBrowser:self URLStringForImageAtIndex:indexPath.row]]];
+    } else {
+        [cell setZoomableImage:[_dataSource photoBrowser:self imageAtIndex:indexPath.row]];
+    }
 }
 
 
@@ -236,12 +247,12 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 #pragma mark - AGPhotoBrowserCellDelegate
 
-- (void)didPanOnZoomableViewForCell:(AGPhotoBrowserCell *)cell withRecognizer:(UIPanGestureRecognizer *)recognizer
+- (void)didPanOnZoomableViewForCell:(id<AGPhotoBrowserCellProtocol>)cell withRecognizer:(UIPanGestureRecognizer *)recognizer
 {
 	[self p_imageViewPanned:recognizer];
 }
 
-- (void)didDoubleTapOnZoomableViewForCell:(AGPhotoBrowserCell *)cell
+- (void)didDoubleTapOnZoomableViewForCell:(id<AGPhotoBrowserCellProtocol>)cell
 {
 	self.displayingDetailedView = !self.isDisplayingDetailedView;
 }
@@ -456,7 +467,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	}
 }
 
-
+/*
 #pragma mark - Orientation change
 
 - (void)statusBarDidChangeFrame:(NSNotification *)notification
@@ -465,12 +476,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     CGFloat angle = UIInterfaceOrientationAngleOfOrientation(orientation);
     CGAffineTransform viewTransform = CGAffineTransformMakeRotation(angle);
     CGRect frame = [UIScreen mainScreen].bounds;
-	/*NSLog(@"Angle %f", angle);
-    NSLog(@"Transform %@", NSStringFromCGAffineTransform(viewTransform));*/
 	[self setTableIfNotEqualTransform:viewTransform frame:frame];
-    /*NSLog(@"Window frame %@", NSStringFromCGRect(self.currentWindow.frame));
-    NSLog(@"View frame %@", NSStringFromCGRect(self.frame));
-    NSLog(@"Table frame %@", NSStringFromCGRect(self.photoTableView.frame));*/
     [self.photoTableView reloadData];
 }
 
@@ -514,6 +520,6 @@ CGFloat UIInterfaceOrientationAngleOfOrientation(UIDeviceOrientation orientation
     }
     
     return angle;
-}
+}*/
 
 @end

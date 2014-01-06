@@ -33,7 +33,7 @@
     }
     return self;
 }
-
+/*
 - (void)updateConstraints
 {
 	[self removeConstraints:self.constraints];
@@ -62,7 +62,7 @@
 													multiplier:1.f constant:0.f]];
 	
 	[super updateConstraints];
-}
+}*/
 
 
 #pragma mark - Public methods
@@ -71,7 +71,7 @@
 {
     self.imageView.image = image;
 	
-	[self updateConstraints];
+	//[self updateConstraints];
 }
 
 

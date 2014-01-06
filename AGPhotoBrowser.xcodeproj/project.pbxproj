@@ -47,9 +47,9 @@
 /* Begin PBXFileReference section */
 		8D3D8ABA184202DE00154B6B /* AGPhotoBrowserZoomableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserZoomableView.h; sourceTree = "<group>"; };
 		8D3D8ABB184202DE00154B6B /* AGPhotoBrowserZoomableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AGPhotoBrowserZoomableView.m; sourceTree = "<group>"; };
+		A25C8828187AEB600097C690 /* AGPhotoBrowserCellProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserCellProtocol.h; sourceTree = "<group>"; };
 		DE13F9EA1879A23A00449C49 /* AGPhotoBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserCell.h; sourceTree = "<group>"; };
 		DE13F9EB1879A23A00449C49 /* AGPhotoBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AGPhotoBrowserCell.m; sourceTree = "<group>"; };
-		DE13F9ED1879B2A800449C49 /* AGPhotoBrowserCellDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserCellDelegate.h; sourceTree = "<group>"; };
 		DE2A3D7617A575C700CE0CA5 /* AGPhotoBrowser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AGPhotoBrowser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE2A3D7917A575C700CE0CA5 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		DE2A3D7B17A575C700CE0CA5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -218,7 +218,7 @@
 				DE48791917CA84740048D0FC /* AGPhotoBrowserOverlayView.m */,
 				DE48791A17CA84740048D0FC /* AGPhotoBrowserView.h */,
 				DE48791B17CA84740048D0FC /* AGPhotoBrowserView.m */,
-				DE13F9ED1879B2A800449C49 /* AGPhotoBrowserCellDelegate.h */,
+				A25C8828187AEB600097C690 /* AGPhotoBrowserCellProtocol.h */,
 				DE13F9EA1879A23A00449C49 /* AGPhotoBrowserCell.h */,
 				DE13F9EB1879A23A00449C49 /* AGPhotoBrowserCell.m */,
 				8D3D8ABA184202DE00154B6B /* AGPhotoBrowserZoomableView.h */,
