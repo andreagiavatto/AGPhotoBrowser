@@ -261,7 +261,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	int index = floor(targetContentOffset.y / self.cellHeight);
 	
     if ([self.dataSource respondsToSelector:@selector(photoBrowser:willDisplayActionButtonAtIndex:)]) {
-        self.overlayView.actionButton.hidden = [self.dataSource photoBrowser:self willDisplayActionButtonAtIndex:index];
+        self.overlayView.actionButton.hidden = ![self.dataSource photoBrowser:self willDisplayActionButtonAtIndex:index];
     } else {
         self.overlayView.actionButton.hidden = NO;
     }
