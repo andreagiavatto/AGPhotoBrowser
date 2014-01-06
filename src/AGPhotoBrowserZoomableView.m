@@ -34,6 +34,36 @@
     return self;
 }
 
+- (void)updateConstraints
+{
+	[self removeConstraints:self.constraints];
+	
+	NSDictionary *constrainedViews = NSDictionaryOfVariableBindings(_imageView);
+	
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_imageView]|"
+																 options:0
+																 metrics:@{}
+																   views:constrainedViews]];
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_imageView]|"
+																 options:0
+																 metrics:@{}
+																   views:constrainedViews]];
+	[self addConstraint:[NSLayoutConstraint constraintWithItem:_imageView
+													 attribute:NSLayoutAttributeCenterX
+													 relatedBy:NSLayoutRelationEqual
+														toItem:_imageView.superview
+													 attribute:NSLayoutAttributeCenterX
+													multiplier:1.f constant:0.f]];
+	[self addConstraint:[NSLayoutConstraint constraintWithItem:_imageView
+													 attribute:NSLayoutAttributeCenterY
+													 relatedBy:NSLayoutRelationEqual
+														toItem:_imageView.superview
+													 attribute:NSLayoutAttributeCenterY
+													multiplier:1.f constant:0.f]];
+	
+	[super updateConstraints];
+}
+
 
 #pragma mark - Public methods
 
@@ -41,7 +71,7 @@
 {
     self.imageView.image = image;
 	
-	//[self updateConstraints];
+	[self updateConstraints];
 }
 
 
@@ -61,12 +91,12 @@
 - (void)doubleTapped:(UITapGestureRecognizer *)recognizer
 {
     if (self.zoomScale > 1.0f) {
-        [UIView animateWithDuration:0.4f animations:^{
+        [UIView animateWithDuration:0.35 animations:^{
             self.zoomScale = 1.0f;
         }];
     }
     else {
-        [UIView animateWithDuration:0.4f animations:^{
+        [UIView animateWithDuration:0.35 animations:^{
             CGPoint point = [recognizer locationInView:self];
             [self zoomToRect:CGRectMake(point.x, point.y, 0, 0) animated:YES];
         }];
