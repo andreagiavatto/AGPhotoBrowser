@@ -21,8 +21,6 @@
 {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
-		//self.contentView.translatesAutoresizingMaskIntoConstraints = NO;
-		//self.contentView.autoresizingMask = UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth;
 		[self setupCell];
 	}
 	

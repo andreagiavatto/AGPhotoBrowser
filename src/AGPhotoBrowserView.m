@@ -108,7 +108,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		_photoTableView.delegate = self;
 		_photoTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 		_photoTableView.backgroundColor = [UIColor clearColor];
-		//_photoTableView.rowHeight = screenBounds.size.width;
 		_photoTableView.pagingEnabled = YES;
 		_photoTableView.showsVerticalScrollIndicator = NO;
 		_photoTableView.showsHorizontalScrollIndicator = NO;
@@ -138,10 +137,14 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (CGFloat)cellHeight
 {
+    NSLog(@"Current window frame %@", NSStringFromCGRect(self.currentWindow.frame));
 	UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    NSLog(@"Orientation %d", orientation);
 	if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
-		return CGRectGetHeight(self.currentWindow.frame);
+		NSLog(@"LANDSCAPE");
+        return CGRectGetHeight(self.currentWindow.frame);
 	}
+    NSLog(@"PORTRAIT");
 	
 	return CGRectGetWidth(self.currentWindow.frame);
 }
@@ -215,6 +218,9 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)configureCell:(AGPhotoBrowserCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    CGRect cellFrame = cell.frame;
+    cellFrame.size.width = self.cellHeight;
+    cell.frame = cellFrame;
 	[cell resetZoomScale];
     [cell setZoomableImage:[_dataSource photoBrowser:self imageAtIndex:indexPath.row]];
 }
@@ -459,15 +465,12 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     CGFloat angle = UIInterfaceOrientationAngleOfOrientation(orientation);
     CGAffineTransform viewTransform = CGAffineTransformMakeRotation(angle);
     CGRect frame = [UIScreen mainScreen].bounds;
-	NSLog(@"Angle %f", angle);
-    NSLog(@"Transform %@", NSStringFromCGAffineTransform(viewTransform));
+	/*NSLog(@"Angle %f", angle);
+    NSLog(@"Transform %@", NSStringFromCGAffineTransform(viewTransform));*/
 	[self setTableIfNotEqualTransform:viewTransform frame:frame];
-    //[self setIfNotEqualTransform:viewTransform frame:frame];
-    //[self setNeedsUpdateConstraints];
-	//self.photoTableView.frame = self.currentWindow.frame;
-    NSLog(@"Window frame %@", NSStringFromCGRect(self.currentWindow.frame));
+    /*NSLog(@"Window frame %@", NSStringFromCGRect(self.currentWindow.frame));
     NSLog(@"View frame %@", NSStringFromCGRect(self.frame));
-    NSLog(@"Table frame %@", NSStringFromCGRect(self.photoTableView.frame));
+    NSLog(@"Table frame %@", NSStringFromCGRect(self.photoTableView.frame));*/
     [self.photoTableView reloadData];
 }
 
