@@ -26,24 +26,7 @@
 	
 	return self;
 }
-/*
-- (void)updateConstraints
-{
-	[self.contentView removeConstraints:self.contentView.constraints];
-	
-	NSDictionary *constrainedViews = NSDictionaryOfVariableBindings(_zoomableView);
-	
-	[self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_zoomableView]|"
-																			 options:0
-																			 metrics:@{}
-																			   views:constrainedViews]];
-	[self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_zoomableView]|"
-																			 options:0
-																			 metrics:@{}
-																			   views:constrainedViews]];
-	
-	[super updateConstraints];
-}*/
+
 
 #pragma mark - Getters
 
@@ -91,13 +74,11 @@
 
 #pragma mark - Setters
 
-- (void)setZoomableImage:(UIImage *)zoomableImage
+- (void)setCellImage:(UIImage *)cellImage
 {
-	if (zoomableImage) {
-		[self.zoomableView setImage:zoomableImage];
+	if (cellImage) {
+		[self.zoomableView setImage:cellImage];
 	}
-	
-	//[self updateConstraints];
 }
 
 

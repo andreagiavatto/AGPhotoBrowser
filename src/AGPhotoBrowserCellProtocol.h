@@ -22,10 +22,10 @@
 @protocol AGPhotoBrowserCellProtocol <NSObject>
 
 @property (nonatomic, weak) id<AGPhotoBrowserCellDelegate> delegate;
-- (void)setZoomableImage:(UIImage *)image;
+- (void)setCellImage:(UIImage *)image;
 
 @optional
 - (void)resetZoomScale;
-- (void)setZoomableImageWithURL:(NSURL *)url;
+- (void)setCellImageWithURL:(NSURL *)url;
 
 @end

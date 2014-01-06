@@ -14,7 +14,7 @@
 
 @property (nonatomic, weak) id<AGPhotoBrowserCellDelegate> delegate;
 
-- (void)setZoomableImage:(UIImage *)zoomableImage;
+- (void)setCellImage:(UIImage *)cellImage;
 - (void)resetZoomScale;
 
 @end

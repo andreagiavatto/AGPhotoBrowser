@@ -33,36 +33,6 @@
     }
     return self;
 }
-/*
-- (void)updateConstraints
-{
-	[self removeConstraints:self.constraints];
-	
-	NSDictionary *constrainedViews = NSDictionaryOfVariableBindings(_imageView);
-	
-	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_imageView]|"
-																 options:0
-																 metrics:@{}
-																   views:constrainedViews]];
-	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_imageView]|"
-																 options:0
-																 metrics:@{}
-																   views:constrainedViews]];
-	[self addConstraint:[NSLayoutConstraint constraintWithItem:_imageView
-													attribute:NSLayoutAttributeCenterX
-													relatedBy:NSLayoutRelationEqual
-													   toItem:_imageView.superview
-													attribute:NSLayoutAttributeCenterX
-												   multiplier:1.f constant:0.f]];
-	[self addConstraint:[NSLayoutConstraint constraintWithItem:_imageView
-													 attribute:NSLayoutAttributeCenterY
-													 relatedBy:NSLayoutRelationEqual
-														toItem:_imageView.superview
-													 attribute:NSLayoutAttributeCenterY
-													multiplier:1.f constant:0.f]];
-	
-	[super updateConstraints];
-}*/
 
 
 #pragma mark - Public methods

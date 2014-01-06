@@ -67,11 +67,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	[self addSubview:self.photoTableView];
 	[self addSubview:self.doneButton];
 	[self addSubview:self.overlayView];
-	/*
-	[[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(statusBarDidChangeFrame:)
-                                                 name:UIDeviceOrientationDidChangeNotification
-                                               object:nil];*/
 }
 
 
@@ -137,17 +132,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (CGFloat)cellHeight
 {
-    /*NSLog(@"Current window frame %@", NSStringFromCGRect(self.currentWindow.frame));
-	UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    NSLog(@"Orientation %d", orientation);
-	if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
-		NSLog(@"LANDSCAPE");
-        return CGRectGetHeight(self.currentWindow.frame);
-	}
-    NSLog(@"PORTRAIT");
-	
-	return CGRectGetWidth(self.currentWindow.frame);*/
-    
     return CGRectGetWidth([UIScreen mainScreen].bounds);
 }
 
@@ -227,12 +211,15 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     CGRect cellFrame = cell.frame;
     cellFrame.size.width = self.cellHeight;
     cell.frame = cellFrame;
-	[cell resetZoomScale];
     
-    if ([_dataSource respondsToSelector:@selector(photoBrowser:URLStringForImageAtIndex:)] && [cell respondsToSelector:@selector(setZoomableImageWithURL:)]) {
-        [cell setZoomableImageWithURL:[NSURL URLWithString:[_dataSource photoBrowser:self URLStringForImageAtIndex:indexPath.row]]];
+    if ([cell respondsToSelector:@selector(resetZoomScale)]) {
+        [cell resetZoomScale];
+    }
+    
+    if ([_dataSource respondsToSelector:@selector(photoBrowser:URLStringForImageAtIndex:)] && [cell respondsToSelector:@selector(setCellImageWithURL:)]) {
+        [cell setCellImageWithURL:[NSURL URLWithString:[_dataSource photoBrowser:self URLStringForImageAtIndex:indexPath.row]]];
     } else {
-        [cell setZoomableImage:[_dataSource photoBrowser:self imageAtIndex:indexPath.row]];
+        [cell setCellImage:[_dataSource photoBrowser:self imageAtIndex:indexPath.row]];
     }
 }
 
