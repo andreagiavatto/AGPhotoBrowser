@@ -254,12 +254,8 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	CGPoint targetContentOffset = scrollView.contentOffset;
     
 	UITableView *tv = (UITableView*)scrollView;
-	NSIndexPath *indexPathOfTopRowAfterScrolling = [tv indexPathForRowAtPoint:
-													targetContentOffset
-													];
-	CGRect rectForTopRowAfterScrolling = [tv rectForRowAtIndexPath:
-										  indexPathOfTopRowAfterScrolling
-										  ];
+	NSIndexPath *indexPathOfTopRowAfterScrolling = [tv indexPathForRowAtPoint:targetContentOffset];
+	CGRect rectForTopRowAfterScrolling = [tv rectForRowAtIndexPath:indexPathOfTopRowAfterScrolling];
 	targetContentOffset.y = rectForTopRowAfterScrolling.origin.y;
 	
 	int index = floor(targetContentOffset.y / self.cellHeight);
@@ -298,7 +294,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     self.previousWindow = [[UIApplication sharedApplication] keyWindow];
     
     self.currentWindow = [[UIWindow alloc] initWithFrame:self.previousWindow.bounds];
-    //self.currentWindow.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
     self.currentWindow.windowLevel = UIWindowLevelStatusBar;
     self.currentWindow.hidden = NO;
     self.currentWindow.backgroundColor = [UIColor clearColor];
@@ -453,60 +448,5 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		[_delegate photoBrowser:self didTapOnDoneButton:sender];
 	}
 }
-
-/*
-#pragma mark - Orientation change
-
-- (void)statusBarDidChangeFrame:(NSNotification *)notification
-{
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    CGFloat angle = UIInterfaceOrientationAngleOfOrientation(orientation);
-    CGAffineTransform viewTransform = CGAffineTransformMakeRotation(angle);
-    CGRect frame = [UIScreen mainScreen].bounds;
-	[self setTableIfNotEqualTransform:viewTransform frame:frame];
-    [self.photoTableView reloadData];
-}
-
-- (void)setIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame
-{
-    if (!CGAffineTransformEqualToTransform(self.transform, transform)) {
-        self.transform = transform;
-    }
-    if (!CGRectEqualToRect(self.frame, frame)) {
-        self.frame = frame;
-    }
-}
-
-- (void)setTableIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame
-{
-    if(!CGAffineTransformEqualToTransform(self.photoTableView.transform, transform)) {
-        self.photoTableView.transform = transform;
-    }
-	if (!CGRectEqualToRect(self.photoTableView.frame, frame)) {
-        self.photoTableView.frame = frame;
-    }
-}
-
-CGFloat UIInterfaceOrientationAngleOfOrientation(UIDeviceOrientation orientation)
-{
-    CGFloat angle;
-    
-    switch (orientation) {
-        case UIDeviceOrientationPortraitUpsideDown:
-            angle = -M_PI_2;
-            break;
-        case UIDeviceOrientationLandscapeLeft:
-            angle = 0;
-            break;
-        case UIDeviceOrientationLandscapeRight:
-            angle = M_PI;
-            break;
-        default:
-            angle = -M_PI_2;
-            break;
-    }
-    
-    return angle;
-}*/
 
 @end
