@@ -9,14 +9,14 @@
 #import "AGPhotoBrowserOverlayView.h"
 
 #import <QuartzCore/QuartzCore.h>
-
+#import "AGPhotoBrowserOverlayGradientView.h"
 
 @interface AGPhotoBrowserOverlayView () {
 	BOOL _animated;
-	CAGradientLayer *_gradientLayer;
 }
 
 @property (nonatomic, strong) UIView *sharingView;
+@property (nonatomic, strong) AGPhotoBrowserOverlayGradientView *gradientView;
 @property (nonatomic, assign) BOOL descriptionExpanded;
 @property (nonatomic, strong) UITapGestureRecognizer *tapGesture;
 
@@ -45,9 +45,7 @@
 - (void)layoutSubviews
 {
 	[super layoutSubviews];
-	
-	_gradientLayer.frame = self.bounds;
-	
+		
 	self.titleLabel.frame = CGRectMake(20, 35, CGRectGetWidth(self.frame) - 40, 20);
 	self.separatorView.frame = CGRectMake(20, CGRectGetMinY(self.titleLabel.frame) + CGRectGetHeight(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), 1);
     
@@ -120,9 +118,14 @@
 {
     [self removeConstraints:self.constraints];
     
-    NSDictionary *constrainedViews = NSDictionaryOfVariableBindings(_sharingView, _titleLabel, _separatorView, _descriptionLabel, _seeMoreButton, _actionButton);
+    NSDictionary *constrainedViews = NSDictionaryOfVariableBindings(_sharingView, _gradientView, _titleLabel, _separatorView, _descriptionLabel, _seeMoreButton, _actionButton);
     
+    // -- Vertical constraints
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_sharingView]|"
+                                                                 options:0
+                                                                 metrics:@{}
+                                                                   views:constrainedViews]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_gradientView]|"
                                                                  options:0
                                                                  metrics:@{}
                                                                    views:constrainedViews]];
@@ -139,7 +142,12 @@
 																 metrics:@{}
 																   views:constrainedViews]];
     
+    // -- Horizontal constraints
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_sharingView]|"
+                                                                 options:0
+                                                                 metrics:@{}
+                                                                   views:constrainedViews]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_gradientView]|"
                                                                  options:0
                                                                  metrics:@{}
                                                                    views:constrainedViews]];
@@ -151,7 +159,7 @@
                                                                  options:0
                                                                  metrics:@{}
                                                                    views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(==20)-[_descriptionLabel][_seeMoreButton(==60)]-(==75)-|"
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(==20)-[_descriptionLabel][_seeMoreButton(==60)]-(==25)-|"
 																 options:0
 																 metrics:@{}
 																   views:constrainedViews]];
@@ -211,12 +219,12 @@
 
 - (void)p_seeMoreButtonTapped:(UIButton *)sender
 {
-	/*if ([_delegate respondsToSelector:@selector(sharingView:didTapOnSeeMoreButton:)]) {
+	if ([_delegate respondsToSelector:@selector(sharingView:didTapOnSeeMoreButton:)]) {
 		[_delegate sharingView:self didTapOnSeeMoreButton:sender];
 		self.descriptionExpanded = YES;
-		[self setNeedsLayout];
+		
 		[self.sharingView addGestureRecognizer:self.tapGesture];
-	}*/
+	}
 }
 
 
@@ -284,13 +292,22 @@
 	if (!_sharingView) {
 		_sharingView = [[UIView alloc] initWithFrame:CGRectZero];
         _sharingView.translatesAutoresizingMaskIntoConstraints = NO;
-		_gradientLayer = [CAGradientLayer layer];
-		_gradientLayer.frame = self.bounds;
-		_gradientLayer.colors = [NSArray arrayWithObjects:(id)[[UIColor clearColor] CGColor], (id)[[UIColor blackColor] CGColor], nil];
-		[_sharingView.layer insertSublayer:_gradientLayer atIndex:0];
+
+        [_sharingView addSubview:self.gradientView];
 	}
 	
 	return _sharingView;
+}
+
+- (AGPhotoBrowserOverlayGradientView *)gradientView
+{
+    if (!_gradientView) {
+        _gradientView = [[AGPhotoBrowserOverlayGradientView alloc] initWithFrame:CGRectZero];
+        _gradientView.translatesAutoresizingMaskIntoConstraints = NO;
+        _gradientView.layer.colors = [NSArray arrayWithObjects:(id)[[UIColor clearColor] CGColor], (id)[[UIColor blackColor] CGColor], nil];
+    }
+    
+    return _gradientView;
 }
 
 - (UILabel *)titleLabel

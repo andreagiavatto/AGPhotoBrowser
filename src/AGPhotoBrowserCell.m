@@ -112,6 +112,7 @@
 
 - (void)setupCell
 {
+    self.contentView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	[self.contentView addSubview:self.zoomableView];
 }
 
