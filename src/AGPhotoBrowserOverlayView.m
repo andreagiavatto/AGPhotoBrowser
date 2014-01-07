@@ -204,9 +204,9 @@
 
 - (void)p_actionButtonTapped:(UIButton *)sender
 {
-	/*if ([_delegate respondsToSelector:@selector(sharingView:didTapOnActionButton:)]) {
+	if ([_delegate respondsToSelector:@selector(sharingView:didTapOnActionButton:)]) {
 		[_delegate sharingView:self didTapOnActionButton:sender];
-	}*/
+	}
 }
 
 - (void)p_seeMoreButtonTapped:(UIButton *)sender
