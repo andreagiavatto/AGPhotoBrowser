@@ -130,11 +130,11 @@
 																 options:0
 																 metrics:@{}
 																   views:constrainedViews]];
-	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[_seeMoreButton(==20)]-(==10)-|"
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[_seeMoreButton(==20)]-(==12)-|"
 																 options:0
 																 metrics:@{}
 																   views:constrainedViews]];
-	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[_actionButton(==32)]-(==10)-|"
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[_actionButton(==32)]-(==5)-|"
 																 options:0
 																 metrics:@{}
 																   views:constrainedViews]];
@@ -151,7 +151,7 @@
                                                                  options:0
                                                                  metrics:@{}
                                                                    views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(==20)-[_descriptionLabel][_seeMoreButton(==55)]-(==20)-|"
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(==20)-[_descriptionLabel][_seeMoreButton(==60)]-(==75)-|"
 																 options:0
 																 metrics:@{}
 																   views:constrainedViews]];
@@ -233,8 +233,7 @@
 - (void)setFrame:(CGRect)frame
 {
 	[super setFrame:frame];
-	
-	//self.sharingView.frame = CGRectMake(0, 0, CGRectGetWidth(frame), CGRectGetHeight(frame));
+
     [self setNeedsUpdateConstraints];
 }
 
@@ -313,7 +312,7 @@
 		_separatorView = [[UIView alloc] initWithFrame:CGRectZero];
         _separatorView.translatesAutoresizingMaskIntoConstraints = NO;
 		_separatorView.backgroundColor = [UIColor lightGrayColor];
-        _separatorView.hidden = YES;
+        //_separatorView.hidden = YES;
 	}
 	
 	return _separatorView;
@@ -342,7 +341,7 @@
 		[_seeMoreButton setBackgroundColor:[UIColor clearColor]];
 		[_seeMoreButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
 		_seeMoreButton.titleLabel.font = [UIFont boldSystemFontOfSize:13];
-        _seeMoreButton.hidden = YES;
+        //_seeMoreButton.hidden = YES;
 		
 		[_seeMoreButton addTarget:self action:@selector(p_seeMoreButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 	}

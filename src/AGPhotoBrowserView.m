@@ -26,6 +26,8 @@ UIGestureRecognizerDelegate
     BOOL _navigationBarWasHidden;
 	CGRect _originalParentViewFrame;
 	NSInteger _currentlySelectedIndex;
+    
+    CGRect _overlayRect;
 }
 
 @property (nonatomic, strong, readwrite) UIButton *doneButton;
@@ -74,6 +76,26 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
                                                object:nil];
 }
 
+- (void)updateConstraints
+{
+	[self removeConstraints:self.constraints];
+	
+	NSDictionary *constrainedViews = NSDictionaryOfVariableBindings(_doneButton, _overlayView);
+	
+	// -- Vertical constraints
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(==20)-[_doneButton(==32)]-(>=0)-|"
+																 options:0
+																 metrics:@{}
+																   views:constrainedViews]];
+	// -- Horizontal constraints
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(>=0)-[_doneButton(==60)]-(==10)-|"
+																 options:0
+																 metrics:@{}
+																   views:constrainedViews]];
+	
+	[super updateConstraints];
+}
+
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -85,8 +107,8 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 - (UIButton *)doneButton
 {
 	if (!_doneButton) {
-		int currentScreenWidth = CGRectGetWidth([[UIScreen mainScreen] bounds]);
-		_doneButton = [[UIButton alloc] initWithFrame:CGRectMake(currentScreenWidth - 60 - 10, 20, 60, 32)];
+		_doneButton = [[UIButton alloc] initWithFrame:CGRectZero/*CGRectMake(currentScreenWidth - 60 - 10, 20, 60, 32)*/];
+        _doneButton.translatesAutoresizingMaskIntoConstraints = NO;
 		[_doneButton setTitle:NSLocalizedString(@"Done", @"Title for Done button") forState:UIControlStateNormal];
 		_doneButton.layer.cornerRadius = 3.0f;
 		_doneButton.layer.borderColor = [UIColor colorWithWhite:0.9 alpha:0.9].CGColor;
@@ -133,8 +155,8 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 - (AGPhotoBrowserOverlayView *)overlayView
 {
 	if (!_overlayView) {
-		_overlayView = [[AGPhotoBrowserOverlayView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.frame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(self.frame), AGPhotoBrowserOverlayInitialHeight)];
-		_overlayView.delegate = self;
+		_overlayView = [[AGPhotoBrowserOverlayView alloc] initWithFrame:CGRectZero/*CGRectMake(0, CGRectGetHeight(self.frame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(self.frame), AGPhotoBrowserOverlayInitialHeight)*/];
+        _overlayView.delegate = self;
 	}
 	
 	return _overlayView;
@@ -210,6 +232,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
         if ([_dataSource respondsToSelector:@selector(cellForBrowser:withReuseIdentifier:)]) {
             cell = [_dataSource cellForBrowser:self withReuseIdentifier:CellIdentifier];
         } else {
+            // -- Provide fallback if the user does not want its own implementation of a cell
             cell = [[AGPhotoBrowserCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
         }
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -369,7 +392,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)sharingView:(AGPhotoBrowserOverlayView *)sharingView didTapOnSeeMoreButton:(UIButton *)actionButton
 {
-	CGSize descriptionSize;
+	/*CGSize descriptionSize;
 	if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
 		descriptionSize = [sharingView.description sizeWithFont:sharingView.descriptionLabel.font constrainedToSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 40, MAXFLOAT)];
 	} else {
@@ -386,7 +409,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
 					 animations:^(){
 						 self.overlayView.frame = CGRectMake(0, floor(CGRectGetHeight(self.frame) - newSharingHeight), CGRectGetWidth(self.frame), newSharingHeight);
-					 }];
+					 }];*/
 }
 
 
@@ -475,14 +498,20 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     CGAffineTransform viewTransform = CGAffineTransformMakeRotation(angleTable);
     CGAffineTransform overlayTransform = CGAffineTransformMakeRotation(angleOverlay);
     CGRect frame = [UIScreen mainScreen].bounds;
-	NSLog(@"Angle %f", angleTable);
-    NSLog(@"Transform %@", NSStringFromCGAffineTransform(viewTransform));
+	//NSLog(@"Angle %f", angleTable);
+    //NSLog(@"Transform %@", NSStringFromCGAffineTransform(viewTransform));
 	[self setTableIfNotEqualTransform:viewTransform frame:frame];
-    [self setOverlayIfNotEqualTransform:overlayTransform frame:CGRectMake(0, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame))];
+    if (orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationPortraitUpsideDown) {
+        _overlayRect = CGRectMake(0, CGRectGetHeight(self.frame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(frame), AGPhotoBrowserOverlayInitialHeight);
+    } else {
+        _overlayRect = CGRectMake(0, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame));
+    }
+    [self setOverlayIfNotEqualTransform:overlayTransform frame:_overlayRect];
+    
     //[self setDoneButtonIfNotEqualTransform:viewTransform frame:self.doneButton.frame];
-    NSLog(@"Window frame %@", NSStringFromCGRect(self.currentWindow.frame));
-    NSLog(@"View frame %@", NSStringFromCGRect(self.frame));
-    NSLog(@"Table frame %@", NSStringFromCGRect(self.photoTableView.frame));
+    //NSLog(@"Window frame %@", NSStringFromCGRect(self.currentWindow.frame));
+    //NSLog(@"View frame %@", NSStringFromCGRect(self.frame));
+    //NSLog(@"Table frame %@", NSStringFromCGRect(self.photoTableView.frame));
     [self.photoTableView reloadData];
 }
 
@@ -505,7 +534,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
         self.photoTableView.frame = frame;
     }
 }
-
+/*
 - (void)setDoneButtonIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame
 {
     if (!CGAffineTransformEqualToTransform(self.doneButton.transform, transform)) {
@@ -515,7 +544,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
         self.doneButton.frame = frame;
     }
 }
-
+*/
 CGFloat UIInterfaceOrientationAngleOfOrientation(UIDeviceOrientation orientation)
 {
     CGFloat angle;
