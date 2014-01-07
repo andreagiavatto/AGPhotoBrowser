@@ -113,6 +113,7 @@
 	[self.sharingView addSubview:self.actionButton];
 	
 	[self addSubview:self.sharingView];
+    [self setNeedsUpdateConstraints];
 }
 
 - (void)updateConstraints
@@ -125,11 +126,20 @@
                                                                  options:0
                                                                  metrics:@{}
                                                                    views:constrainedViews]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(==35)-[_titleLabel(==20)][_separatorView(==1)][_descriptionLabel(>=20)]-(==10)-|"
+																 options:0
+																 metrics:@{}
+																   views:constrainedViews]];
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[_seeMoreButton(==20)]-(==10)-|"
+																 options:0
+																 metrics:@{}
+																   views:constrainedViews]];
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[_actionButton(==32)]-(==10)-|"
+																 options:0
+																 metrics:@{}
+																   views:constrainedViews]];
+    
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_sharingView]|"
-                                                                 options:0
-                                                                 metrics:@{}
-                                                                   views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(==40)-[_titleLabel(==20)][_separatorView(==1)]-[_descriptionLabel(>=20)][_seeMoreButton(==20)]-(>=10)-|"
                                                                  options:0
                                                                  metrics:@{}
                                                                    views:constrainedViews]];
@@ -141,22 +151,14 @@
                                                                  options:0
                                                                  metrics:@{}
                                                                    views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(==20)-[_descriptionLabel]-(==20)-|"
-                                                                 options:0
-                                                                 metrics:@{}
-                                                                   views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(>=20)-[_seeMoreButton(==65)]-(==75)-|"
-                                                                 options:0
-                                                                 metrics:@{}
-                                                                   views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(>=0)-[_actionButton(==55)]-(==10)-|"
-                                                                 options:0
-                                                                 metrics:@{}
-                                                                   views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[_actionButton(==32)]-(==10)-|"
-                                                                 options:0
-                                                                 metrics:@{}
-                                                                   views:constrainedViews]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(==20)-[_descriptionLabel][_seeMoreButton(==55)]-(==20)-|"
+																 options:0
+																 metrics:@{}
+																   views:constrainedViews]];
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(>=0)-[_actionButton(==55)]-(==10)-|"
+																 options:0
+																 metrics:@{}
+																   views:constrainedViews]];
     
     [super updateConstraints];
 }
@@ -233,7 +235,7 @@
 	[super setFrame:frame];
 	
 	//self.sharingView.frame = CGRectMake(0, 0, CGRectGetWidth(frame), CGRectGetHeight(frame));
-    //[self updateConstraints];
+    [self setNeedsUpdateConstraints];
 }
 
 - (void)setVisible:(BOOL)visible
@@ -259,7 +261,7 @@
         self.titleLabel.text = _title;
     }
     
-    [self updateConstraints];
+    [self setNeedsUpdateConstraints];
 }
 
 - (void)setDescription:(NSString *)description
@@ -272,7 +274,7 @@
 		self.descriptionLabel.text = @"";
 	}
     
-    [self updateConstraints];
+    [self setNeedsUpdateConstraints];
 }
 
 
