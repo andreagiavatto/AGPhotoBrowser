@@ -264,7 +264,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-	[self.overlayView resetOverlayView];
+	//[self.overlayView resetOverlayView];
 	
 	CGPoint targetContentOffset = scrollView.contentOffset;
     
@@ -470,38 +470,49 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 - (void)statusBarDidChangeFrame:(NSNotification *)notification
 {
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    CGFloat angle = UIInterfaceOrientationAngleOfOrientation(orientation);
-    CGAffineTransform viewTransform = CGAffineTransformMakeRotation(angle);
+    CGFloat angleTable = UIInterfaceOrientationAngleOfOrientation(orientation);
+    CGFloat angleOverlay = UIInterfaceOrientationAngleOfOrientationForOverlay(orientation);
+    CGAffineTransform viewTransform = CGAffineTransformMakeRotation(angleTable);
+    CGAffineTransform overlayTransform = CGAffineTransformMakeRotation(angleOverlay);
     CGRect frame = [UIScreen mainScreen].bounds;
-	NSLog(@"Angle %f", angle);
+	NSLog(@"Angle %f", angleTable);
     NSLog(@"Transform %@", NSStringFromCGAffineTransform(viewTransform));
 	[self setTableIfNotEqualTransform:viewTransform frame:frame];
-    //[self setIfNotEqualTransform:viewTransform frame:frame];
-    //[self setNeedsUpdateConstraints];
-	//self.photoTableView.frame = self.currentWindow.frame;
+    [self setOverlayIfNotEqualTransform:overlayTransform frame:CGRectMake(0, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame))];
+    //[self setDoneButtonIfNotEqualTransform:viewTransform frame:self.doneButton.frame];
     NSLog(@"Window frame %@", NSStringFromCGRect(self.currentWindow.frame));
     NSLog(@"View frame %@", NSStringFromCGRect(self.frame));
     NSLog(@"Table frame %@", NSStringFromCGRect(self.photoTableView.frame));
     [self.photoTableView reloadData];
 }
 
-- (void)setIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame
+- (void)setOverlayIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame
 {
-    if (!CGAffineTransformEqualToTransform(self.transform, transform)) {
-        self.transform = transform;
+    if (!CGAffineTransformEqualToTransform(self.overlayView.transform, transform)) {
+        self.overlayView.transform = transform;
     }
-    if (!CGRectEqualToRect(self.frame, frame)) {
-        self.frame = frame;
+    if (!CGRectEqualToRect(self.overlayView.frame, frame)) {
+        self.overlayView.frame = frame;
     }
 }
 
 - (void)setTableIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame
 {
-    if(!CGAffineTransformEqualToTransform(self.photoTableView.transform, transform)) {
+    if (!CGAffineTransformEqualToTransform(self.photoTableView.transform, transform)) {
         self.photoTableView.transform = transform;
     }
 	if (!CGRectEqualToRect(self.photoTableView.frame, frame)) {
         self.photoTableView.frame = frame;
+    }
+}
+
+- (void)setDoneButtonIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame
+{
+    if (!CGAffineTransformEqualToTransform(self.doneButton.transform, transform)) {
+        self.doneButton.transform = transform;
+    }
+	if (!CGRectEqualToRect(self.doneButton.frame, frame)) {
+        self.doneButton.frame = frame;
     }
 }
 
@@ -521,6 +532,28 @@ CGFloat UIInterfaceOrientationAngleOfOrientation(UIDeviceOrientation orientation
             break;
         default:
             angle = -M_PI_2;
+            break;
+    }
+    
+    return angle;
+}
+
+CGFloat UIInterfaceOrientationAngleOfOrientationForOverlay(UIDeviceOrientation orientation)
+{
+    CGFloat angle;
+    
+    switch (orientation) {
+        case UIDeviceOrientationPortraitUpsideDown:
+            angle = 0;
+            break;
+        case UIDeviceOrientationLandscapeLeft:
+            angle = M_PI_2;
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            angle = -M_PI_2;
+            break;
+        default:
+            angle = 0;
             break;
     }
     
