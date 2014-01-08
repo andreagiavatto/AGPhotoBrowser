@@ -211,8 +211,8 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
 		cell.delegate = self;
     }
-    NSLog(@"Table frame %@", NSStringFromCGRect(tableView.frame));
-    NSLog(@"Cell frame %@", NSStringFromCGRect(cell.frame));
+    //NSLog(@"Table frame %@", NSStringFromCGRect(tableView.frame));
+    //NSLog(@"Cell frame %@", NSStringFromCGRect(cell.frame));
     [self configureCell:cell forRowAtIndexPath:indexPath];
     
     return cell;

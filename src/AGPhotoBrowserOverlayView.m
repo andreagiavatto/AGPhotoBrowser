@@ -13,6 +13,8 @@
 
 @interface AGPhotoBrowserOverlayView () {
 	BOOL _animated;
+    
+    CAGradientLayer *_gradientLayer;
 }
 
 @property (nonatomic, strong) UIView *sharingView;
@@ -41,28 +43,31 @@
     }
     return self;
 }
-/*
+
 - (void)layoutSubviews
 {
 	[super layoutSubviews];
-		
-	self.titleLabel.frame = CGRectMake(20, 35, CGRectGetWidth(self.frame) - 40, 20);
+    
+    // -- Sharing view
+    _gradientLayer.frame = self.bounds;
+    self.sharingView.frame = CGRectMake(0, 0, CGRectGetWidth(self.bounds), CGRectGetHeight(self.bounds));
+	self.titleLabel.frame = CGRectMake(20, 35, CGRectGetWidth(self.bounds) - 40, 20);
 	self.separatorView.frame = CGRectMake(20, CGRectGetMinY(self.titleLabel.frame) + CGRectGetHeight(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), 1);
     
 	if (self.descriptionExpanded) {
 		CGSize descriptionSize;
 		if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
-			descriptionSize = [_description sizeWithFont:self.descriptionLabel.font  constrainedToSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 40, MAXFLOAT)];
+			descriptionSize = [_description sizeWithFont:self.descriptionLabel.font  constrainedToSize:CGSizeMake(CGRectGetWidth(self.bounds) - 85, MAXFLOAT)];
 		} else {
 			NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
-			CGRect descriptionBoundingRect = [_description boundingRectWithSize:CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 40, MAXFLOAT)
+			CGRect descriptionBoundingRect = [_description boundingRectWithSize:CGSizeMake(CGRectGetWidth(self.bounds) - 65, MAXFLOAT)
 																					  options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
 																					  context:nil];
 			descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
 		}
-		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 280, descriptionSize.height);
+		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, descriptionSize.width, descriptionSize.height);
 	} else {
-		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 220, 20);
+		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, CGRectGetWidth(self.bounds) - 85, 20);
 		self.seeMoreButton.frame = CGRectMake(240, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 65, 20);
 	}
     
@@ -96,8 +101,8 @@
 		self.separatorView.hidden = YES;
 	}
 	
-	self.actionButton.frame = CGRectMake(CGRectGetWidth(self.sharingView.frame) - 55 - 10, CGRectGetHeight(self.sharingView.frame) - 32 - 5, 55, 32);
-}*/
+	self.actionButton.frame = CGRectMake(CGRectGetWidth(self.bounds) - 55 - 10, CGRectGetHeight(self.bounds) - 32 - 5, 55, 32);
+}
 
 - (void)setupView
 {
@@ -111,64 +116,6 @@
 	[self.sharingView addSubview:self.actionButton];
 	
 	[self addSubview:self.sharingView];
-    [self setNeedsUpdateConstraints];
-}
-
-- (void)updateConstraints
-{
-    [self removeConstraints:self.constraints];
-    
-    NSDictionary *constrainedViews = NSDictionaryOfVariableBindings(_sharingView, _gradientView, _titleLabel, _separatorView, _descriptionLabel, _seeMoreButton, _actionButton);
-    
-    // -- Vertical constraints
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_sharingView]|"
-                                                                 options:0
-                                                                 metrics:@{}
-                                                                   views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_gradientView]|"
-                                                                 options:0
-                                                                 metrics:@{}
-                                                                   views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(==35)-[_titleLabel(==20)][_separatorView(==1)][_descriptionLabel(>=20)]-(==10)-|"
-																 options:0
-																 metrics:@{}
-																   views:constrainedViews]];
-	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[_seeMoreButton(==20)]-(==12)-|"
-																 options:0
-																 metrics:@{}
-																   views:constrainedViews]];
-	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[_actionButton(==32)]-(==5)-|"
-																 options:0
-																 metrics:@{}
-																   views:constrainedViews]];
-    
-    // -- Horizontal constraints
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_sharingView]|"
-                                                                 options:0
-                                                                 metrics:@{}
-                                                                   views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_gradientView]|"
-                                                                 options:0
-                                                                 metrics:@{}
-                                                                   views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(==20)-[_titleLabel]-(==20)-|"
-                                                                 options:0
-                                                                 metrics:@{}
-                                                                   views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(==20)-[_separatorView]-(==20)-|"
-                                                                 options:0
-                                                                 metrics:@{}
-                                                                   views:constrainedViews]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(==20)-[_descriptionLabel][_seeMoreButton(==60)]-(==25)-|"
-																 options:0
-																 metrics:@{}
-																   views:constrainedViews]];
-	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(>=0)-[_actionButton(==55)]-(==10)-|"
-																 options:0
-																 metrics:@{}
-																   views:constrainedViews]];
-    
-    [super updateConstraints];
 }
 
 
@@ -185,10 +132,10 @@
 	_animated = animated;
 	self.visible = NO;
 }
-/*
+
 - (void)resetOverlayView
 {
-	if (floor(CGRectGetHeight(self.frame)) != AGPhotoBrowserOverlayInitialHeight) {
+	if (floor(CGRectGetHeight(self.bounds)) != AGPhotoBrowserOverlayInitialHeight) {
 		__block CGRect initialSharingFrame = self.frame;
 		initialSharingFrame.origin.y = round(CGRectGetHeight([UIScreen mainScreen].bounds) - AGPhotoBrowserOverlayInitialHeight);
 		
@@ -206,7 +153,7 @@
 						 }];
 	}
 }
-*/
+
 
 #pragma mark - Buttons
 
@@ -221,6 +168,28 @@
 {
 	if ([_delegate respondsToSelector:@selector(sharingView:didTapOnSeeMoreButton:)]) {
 		[_delegate sharingView:self didTapOnSeeMoreButton:sender];
+        
+        CGSize descriptionSize;
+        if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
+            descriptionSize = [self.description sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(CGRectGetWidth(self.descriptionLabel.frame), MAXFLOAT)];
+        } else {
+            NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
+            CGRect descriptionBoundingRect = [self.description boundingRectWithSize:CGSizeMake(CGRectGetWidth(self.descriptionLabel.frame), MAXFLOAT)
+                                                                                   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
+                                                                                   context:nil];
+            descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
+        }
+        
+        CGRect currentOverlayFrame = self.frame;
+        int newSharingHeight = CGRectGetHeight(currentOverlayFrame) -20 + ceil(descriptionSize.height);
+        currentOverlayFrame.size.height = newSharingHeight;
+        currentOverlayFrame.origin.y -= (newSharingHeight - CGRectGetHeight(self.bounds));
+        
+        [UIView animateWithDuration:AGPhotoBrowserAnimationDuration
+                         animations:^(){
+                             self.frame = currentOverlayFrame;//CGRectMake(0, floor(CGRectGetHeight(self.frame) - newSharingHeight), CGRectGetWidth(self.frame), newSharingHeight);
+                         }];
+        
 		self.descriptionExpanded = YES;
 		
 		[self.sharingView addGestureRecognizer:self.tapGesture];
@@ -232,7 +201,7 @@
 
 - (void)p_tapGestureTapped:(UITapGestureRecognizer *)recognizer
 {
-	//[self resetOverlayView];
+	[self resetOverlayView];
 }
 
 
@@ -241,8 +210,8 @@
 - (void)setFrame:(CGRect)frame
 {
 	[super setFrame:frame];
-
-    [self setNeedsUpdateConstraints];
+    
+    [self setNeedsLayout];
 }
 
 - (void)setVisible:(BOOL)visible
@@ -266,9 +235,11 @@
 	
     if (_title) {
         self.titleLabel.text = _title;
-    }
+    } else {
+		self.descriptionLabel.text = @"";
+	}
     
-    [self setNeedsUpdateConstraints];
+    [self setNeedsLayout];
 }
 
 - (void)setDescription:(NSString *)description
@@ -281,7 +252,7 @@
 		self.descriptionLabel.text = @"";
 	}
     
-    [self setNeedsUpdateConstraints];
+    [self setNeedsLayout];
 }
 
 
@@ -291,9 +262,13 @@
 {
 	if (!_sharingView) {
 		_sharingView = [[UIView alloc] initWithFrame:CGRectZero];
-        _sharingView.translatesAutoresizingMaskIntoConstraints = NO;
-
-        [_sharingView addSubview:self.gradientView];
+        //_sharingView.translatesAutoresizingMaskIntoConstraints = NO;
+        _gradientLayer = [CAGradientLayer layer];
+		_gradientLayer.frame = self.bounds;
+		_gradientLayer.colors = [NSArray arrayWithObjects:(id)[[UIColor clearColor] CGColor], (id)[[UIColor blackColor] CGColor], nil];
+		[_sharingView.layer insertSublayer:_gradientLayer atIndex:0];
+        
+        //[_sharingView addSubview:self.gradientView];
 	}
 	
 	return _sharingView;
@@ -303,7 +278,7 @@
 {
     if (!_gradientView) {
         _gradientView = [[AGPhotoBrowserOverlayGradientView alloc] initWithFrame:CGRectZero];
-        _gradientView.translatesAutoresizingMaskIntoConstraints = NO;
+        //_gradientView.translatesAutoresizingMaskIntoConstraints = NO;
         _gradientView.layer.colors = [NSArray arrayWithObjects:(id)[[UIColor clearColor] CGColor], (id)[[UIColor blackColor] CGColor], nil];
     }
     
@@ -314,7 +289,7 @@
 {
 	if (!_titleLabel) {
 		_titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        _titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        //_titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
 		_titleLabel.textColor = [UIColor colorWithWhite:0.9 alpha:0.9];
 		_titleLabel.font = [UIFont boldSystemFontOfSize:14];
 		_titleLabel.backgroundColor = [UIColor clearColor];
@@ -327,7 +302,7 @@
 {
 	if (!_separatorView) {
 		_separatorView = [[UIView alloc] initWithFrame:CGRectZero];
-        _separatorView.translatesAutoresizingMaskIntoConstraints = NO;
+        //_separatorView.translatesAutoresizingMaskIntoConstraints = NO;
 		_separatorView.backgroundColor = [UIColor lightGrayColor];
         //_separatorView.hidden = YES;
 	}
@@ -339,7 +314,7 @@
 {
 	if (!_descriptionLabel) {
 		_descriptionLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        _descriptionLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        //_descriptionLabel.translatesAutoresizingMaskIntoConstraints = NO;
 		_descriptionLabel.textColor = [UIColor colorWithWhite:0.9 alpha:0.9];
 		_descriptionLabel.font = [UIFont systemFontOfSize:13];
 		_descriptionLabel.backgroundColor = [UIColor clearColor];
@@ -353,7 +328,7 @@
 {
 	if (!_seeMoreButton) {
 		_seeMoreButton = [[UIButton alloc] initWithFrame:CGRectZero];
-        _seeMoreButton.translatesAutoresizingMaskIntoConstraints = NO;
+        //_seeMoreButton.translatesAutoresizingMaskIntoConstraints = NO;
 		[_seeMoreButton setTitle:NSLocalizedString(@"See More", @"Title for See more button") forState:UIControlStateNormal];
 		[_seeMoreButton setBackgroundColor:[UIColor clearColor]];
 		[_seeMoreButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
@@ -370,7 +345,7 @@
 {
 	if (!_actionButton) {
 		_actionButton = [[UIButton alloc] initWithFrame:CGRectZero];
-        _actionButton.translatesAutoresizingMaskIntoConstraints = NO;
+        //_actionButton.translatesAutoresizingMaskIntoConstraints = NO;
 		[_actionButton setTitle:NSLocalizedString(@"● ● ●", @"Title for Action button") forState:UIControlStateNormal];
 		[_actionButton setBackgroundColor:[UIColor clearColor]];
 		[_actionButton setTitleColor:[UIColor colorWithWhite:0.9 alpha:0.9] forState:UIControlStateNormal];
