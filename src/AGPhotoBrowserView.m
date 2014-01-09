@@ -26,6 +26,8 @@ UIGestureRecognizerDelegate
     BOOL _navigationBarWasHidden;
 	CGRect _originalParentViewFrame;
 	NSInteger _currentlySelectedIndex;
+    
+    BOOL _changingOrientation;
 }
 
 @property (nonatomic, strong, readwrite) UIButton *doneButton;
@@ -63,6 +65,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	self.userInteractionEnabled = NO;
 	self.backgroundColor = [UIColor colorWithWhite:0. alpha:0.];
 	_currentlySelectedIndex = NSNotFound;
+    _changingOrientation = NO;
 	
 	[self addSubview:self.photoTableView];
 	[self addSubview:self.doneButton];
@@ -206,6 +209,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
             // -- Provide fallback if the user does not want its own implementation of a cell
             cell = [[AGPhotoBrowserCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
         }
+        
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
 		cell.delegate = self;
     }
@@ -217,11 +221,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)configureCell:(UITableViewCell<AGPhotoBrowserCellProtocol> *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    /*CGRect cellFrame = cell.frame;
-    cellFrame.size.width = self.cellHeight;
-    cell.frame = cellFrame;*/
-    
-    
     if ([cell respondsToSelector:@selector(resetZoomScale)]) {
         [cell resetZoomScale];
     }
@@ -264,20 +263,15 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    if (!self.currentWindow.hidden) {
+    if (!self.currentWindow.hidden && !_changingOrientation) {
         [self.overlayView resetOverlayView];
         
         CGPoint targetContentOffset = scrollView.contentOffset;
         
         UITableView *tv = (UITableView*)scrollView;
         NSIndexPath *indexPathOfTopRowAfterScrolling = [tv indexPathForRowAtPoint:targetContentOffset];
-        CGRect rectForTopRowAfterScrolling = [tv rectForRowAtIndexPath:indexPathOfTopRowAfterScrolling];
-        targetContentOffset.y = rectForTopRowAfterScrolling.origin.y;
-        //NSLog(@"Rect for Top Row %@", NSStringFromCGRect(rectForTopRowAfterScrolling));
-        //NSLog(@"Target content offset %@", NSStringFromCGPoint(targetContentOffset));
-        int index = floor(targetContentOffset.y / self.cellHeight);
-        //NSLog(@"Calculated index: %d", index);
-        [self setupPhotoForIndex:index];
+
+        [self setupPhotoForIndex:indexPathOfTopRowAfterScrolling.row];
     }
 }
 
@@ -455,6 +449,8 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     // -- Get the device orientation
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     
+    _changingOrientation = YES;
+    
     CGFloat angleTable = UIInterfaceOrientationAngleOfOrientation(orientation);
     CGFloat angleOverlay = UIInterfaceOrientationAngleOfOrientationForOverlay(orientation);
     CGAffineTransform viewTransform = CGAffineTransformMakeRotation(angleTable);
@@ -465,6 +461,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	CGRect doneFrame = CGRectZero;
     
     // -- Update table
+    self.photoTableView.scrollEnabled = NO;
 	[self setTableIfNotEqualTransform:viewTransform frame:frame];
 	
     if (UIInterfaceOrientationIsPortrait(orientation)) {
@@ -484,6 +481,8 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
     [self.photoTableView reloadData];
 	[self.photoTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_currentlySelectedIndex inSection:0] atScrollPosition:UITableViewScrollPositionNone animated:NO];
+    
+    _changingOrientation = NO;
 }
 
 - (void)setOverlayIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame

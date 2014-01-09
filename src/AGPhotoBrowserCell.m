@@ -12,6 +12,7 @@
 @interface AGPhotoBrowserCell () <AGPhotoBrowserZoomableViewDelegate>
 
 @property (nonatomic, strong) AGPhotoBrowserZoomableView *zoomableView;
+@property (nonatomic, strong) UIPanGestureRecognizer *panGesture;
 
 @end
 
@@ -47,7 +48,6 @@
 
 - (void)setFrame:(CGRect)frame
 {
-    NSLog(@"Cell frame %@", NSStringFromCGRect(frame));
     // -- Force the right frame
     CGRect correctFrame = frame;
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -72,12 +72,7 @@
 		_zoomableView.userInteractionEnabled = YES;
         _zoomableView.zoomableDelegate = self;
 		
-		UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(p_imageViewPanned:)];
-		panGesture.delegate = self;
-		panGesture.maximumNumberOfTouches = 1;
-		panGesture.minimumNumberOfTouches = 1;
-		[_zoomableView addGestureRecognizer:panGesture];
-		_zoomableView.tag = 1;
+		[_zoomableView addGestureRecognizer:self.panGesture];
         
 		CGAffineTransform transform = CGAffineTransformMakeRotation(M_PI_2);
 		CGPoint origin = _zoomableView.frame.origin;
@@ -90,18 +85,32 @@
 	return _zoomableView;
 }
 
+- (UIPanGestureRecognizer *)panGesture
+{
+    if (!_panGesture) {
+        _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(p_imageViewPanned:)];
+		_panGesture.delegate = self;
+		_panGesture.maximumNumberOfTouches = 1;
+		_panGesture.minimumNumberOfTouches = 1;
+    }
+    
+    return _panGesture;
+}
+
 
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)gestureRecognizer
 {
-    UIView *imageView = [gestureRecognizer view];
-    CGPoint translation = [gestureRecognizer translationInView:[imageView superview]];
-	
-    // -- Check for horizontal gesture
-    if (fabsf(translation.x) > fabsf(translation.y)) {
-        return YES;
-	}
+    if (gestureRecognizer == self.panGesture) {
+        UIView *imageView = [gestureRecognizer view];
+        CGPoint translation = [gestureRecognizer translationInView:[imageView superview]];
+        
+        // -- Check for horizontal gesture
+        if (fabsf(translation.x) > fabsf(translation.y)) {
+            return YES;
+        }
+    }
 	
     return NO;
 }
