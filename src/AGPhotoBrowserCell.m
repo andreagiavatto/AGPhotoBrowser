@@ -45,6 +45,23 @@
 	[super updateConstraints];
 }
 
+- (void)setFrame:(CGRect)frame
+{
+    NSLog(@"Cell frame %@", NSStringFromCGRect(frame));
+    // -- Force the right frame
+    CGRect correctFrame = frame;
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    if (UIInterfaceOrientationIsPortrait(orientation)) {
+        correctFrame.size.width = CGRectGetHeight([[UIScreen mainScreen] bounds]);
+        correctFrame.size.height = CGRectGetWidth([[UIScreen mainScreen] bounds]);
+    } else {
+        correctFrame.size.width = CGRectGetWidth([[UIScreen mainScreen] bounds]);
+        correctFrame.size.height = CGRectGetHeight([[UIScreen mainScreen] bounds]);
+    }
+    
+    [super setFrame:correctFrame];
+}
+
 
 #pragma mark - Getters
 

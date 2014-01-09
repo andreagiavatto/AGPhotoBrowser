@@ -100,6 +100,12 @@
 		self.titleLabel.hidden = YES;
 		self.separatorView.hidden = YES;
 	}
+    
+    if (![_description length] && ![_title length]) {
+        _gradientLayer.hidden = YES;
+    } else {
+        _gradientLayer.hidden = NO;
+    }
 }
 
 - (void)setupView
@@ -129,16 +135,16 @@
 {
     self.descriptionExpanded = NO;
     
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     
     CGRect frame = self.superview.frame;
     CGRect overlayFrame = CGRectZero;
-    if (orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationPortraitUpsideDown) {
+    if (UIInterfaceOrientationIsPortrait(orientation)) {
         overlayFrame = CGRectMake(0, CGRectGetHeight(frame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(frame), AGPhotoBrowserOverlayInitialHeight);
-    } else if (orientation == UIDeviceOrientationLandscapeRight) {
-        overlayFrame = CGRectMake(CGRectGetWidth(frame) - AGPhotoBrowserOverlayInitialHeight, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame));
-    } else {
+    } else if (orientation == UIInterfaceOrientationLandscapeRight) {
         overlayFrame = CGRectMake(0, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame));
+    } else {
+        overlayFrame = CGRectMake(CGRectGetWidth(frame) - AGPhotoBrowserOverlayInitialHeight, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame));
     }
     
     [UIView animateWithDuration:0.15
@@ -194,17 +200,17 @@
     CGSize newDescriptionSize = [self p_sizeForDescriptionLabel];
     
     CGRect currentOverlayFrame = self.frame;
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    if (orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationPortraitUpsideDown) {
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    if (UIInterfaceOrientationIsPortrait(orientation)) {
         int newSharingHeight = CGRectGetHeight(currentOverlayFrame) - 20 + newDescriptionSize.height;
         currentOverlayFrame.size.height = newSharingHeight;
         currentOverlayFrame.origin.y -= (newSharingHeight - CGRectGetHeight(self.bounds));
-    } else if (orientation == UIDeviceOrientationLandscapeRight) {
+    } else if (orientation == UIInterfaceOrientationLandscapeRight) {
         int newSharingWidth = CGRectGetWidth(currentOverlayFrame) - 20 + newDescriptionSize.height;
-        currentOverlayFrame.origin.x -= (newSharingWidth - CGRectGetWidth(currentOverlayFrame));
         currentOverlayFrame.size.width = newSharingWidth;
     } else {
         int newSharingWidth = CGRectGetWidth(currentOverlayFrame) - 20 + newDescriptionSize.height;
+        currentOverlayFrame.origin.x -= (newSharingWidth - CGRectGetWidth(currentOverlayFrame));
         currentOverlayFrame.size.width = newSharingWidth;
     }
     

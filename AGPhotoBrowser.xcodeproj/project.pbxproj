@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8D3D8ABC184202DE00154B6B /* AGPhotoBrowserZoomableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D3D8ABB184202DE00154B6B /* AGPhotoBrowserZoomableView.m */; };
+		A2A200B8187EF38D0053CA21 /* sample4.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A2A200B7187EF38D0053CA21 /* sample4.jpg */; };
 		DE13F9EC1879A23A00449C49 /* AGPhotoBrowserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DE13F9EB1879A23A00449C49 /* AGPhotoBrowserCell.m */; };
 		DE2A3D7A17A575C700CE0CA5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE2A3D7917A575C700CE0CA5 /* UIKit.framework */; };
 		DE2A3D7C17A575C700CE0CA5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE2A3D7B17A575C700CE0CA5 /* Foundation.framework */; };
@@ -48,6 +49,7 @@
 		8D3D8ABA184202DE00154B6B /* AGPhotoBrowserZoomableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserZoomableView.h; sourceTree = "<group>"; };
 		8D3D8ABB184202DE00154B6B /* AGPhotoBrowserZoomableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AGPhotoBrowserZoomableView.m; sourceTree = "<group>"; };
 		A25C8828187AEB600097C690 /* AGPhotoBrowserCellProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserCellProtocol.h; sourceTree = "<group>"; };
+		A2A200B7187EF38D0053CA21 /* sample4.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = sample4.jpg; sourceTree = "<group>"; };
 		DE13F9EA1879A23A00449C49 /* AGPhotoBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserCell.h; sourceTree = "<group>"; };
 		DE13F9EB1879A23A00449C49 /* AGPhotoBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AGPhotoBrowserCell.m; sourceTree = "<group>"; };
 		DE2A3D7617A575C700CE0CA5 /* AGPhotoBrowser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AGPhotoBrowser.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -205,6 +207,7 @@
 				DE2E1B2117C923BF0027C3C8 /* sample1.jpg */,
 				DE2E1B2217C923BF0027C3C8 /* sample2.jpg */,
 				DE2E1B2317C923BF0027C3C8 /* sample3.jpg */,
+				A2A200B7187EF38D0053CA21 /* sample4.jpg */,
 			);
 			path = Images;
 			sourceTree = "<group>";
@@ -306,6 +309,7 @@
 				DE2E1B2417C923BF0027C3C8 /* sample1.jpg in Resources */,
 				DE2E1B2517C923BF0027C3C8 /* sample2.jpg in Resources */,
 				DE2E1B2617C923BF0027C3C8 /* sample3.jpg in Resources */,
+				A2A200B8187EF38D0053CA21 /* sample4.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

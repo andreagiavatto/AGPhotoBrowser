@@ -13,6 +13,7 @@
 #define SAMPLE_IMAGE_1			[UIImage imageNamed:@"sample1.jpg"]
 #define SAMPLE_IMAGE_2			[UIImage imageNamed:@"sample2.jpg"]
 #define SAMPLE_IMAGE_3			[UIImage imageNamed:@"sample3.jpg"]
+#define SAMPLE_IMAGE_4			[UIImage imageNamed:@"sample4.jpg"]
 
 
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate, AGPhotoBrowserDelegate, AGPhotoBrowserDataSource> {
@@ -46,7 +47,12 @@
 		  @"Image": SAMPLE_IMAGE_3,
 		  @"Title" : @"Rainbow flower",
 		  @"Description" : @"A colorful image with a meaningless long description for testing purposes that also spans on multiple lines."
-	}
+	},
+      @{
+          @"Image": SAMPLE_IMAGE_4,
+          @"Title" : @"",
+          @"Description" : @""
+    }
 	];
 }
 
