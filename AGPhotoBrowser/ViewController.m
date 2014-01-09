@@ -45,7 +45,7 @@
 	  @{
 		  @"Image": SAMPLE_IMAGE_3,
 		  @"Title" : @"Rainbow flower",
-		  @"Description" : @"A colorful image with a meaningless long description for testing purposes."
+		  @"Description" : @"A colorful image with a meaningless long description for testing purposes that also spans on multiple lines."
 	}
 	];
 }

@@ -418,9 +418,11 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
 		CGPoint translatedPoint;
 		
-		if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
+		if (orientation == UIDeviceOrientationLandscapeLeft) {
 			translatedPoint = CGPointMake(_startingPanPoint.x + middlePanPoint.x, _startingPanPoint.y);
-		} else {
+		} else if (orientation == UIDeviceOrientationLandscapeRight) {
+            translatedPoint = CGPointMake(_startingPanPoint.x - middlePanPoint.x, _startingPanPoint.y);
+        } else {
 			translatedPoint = CGPointMake(_startingPanPoint.x - middlePanPoint.y, _startingPanPoint.y);
 		}
 		

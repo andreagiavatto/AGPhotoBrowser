@@ -129,21 +129,22 @@
 {
     self.descriptionExpanded = NO;
     
-	if (floor(CGRectGetHeight(self.bounds)) != AGPhotoBrowserOverlayInitialHeight) {
-		__block CGRect initialSharingFrame = self.frame;
-		initialSharingFrame.origin.y = round(CGRectGetHeight([UIScreen mainScreen].bounds) - AGPhotoBrowserOverlayInitialHeight);
-		
-		[UIView animateWithDuration:0.15
-						 animations:^(){
-							 self.frame = initialSharingFrame;
-						 } completion:^(BOOL finished){
-							 initialSharingFrame.size.height = AGPhotoBrowserOverlayInitialHeight;
-							 [UIView animateWithDuration:AGPhotoBrowserAnimationDuration
-											  animations:^(){
-												  self.frame = initialSharingFrame;
-											  }];
-						 }];
-	}
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    
+    CGRect frame = self.superview.frame;
+    CGRect overlayFrame = CGRectZero;
+    if (orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationPortraitUpsideDown) {
+        overlayFrame = CGRectMake(0, CGRectGetHeight(frame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(frame), AGPhotoBrowserOverlayInitialHeight);
+    } else if (orientation == UIDeviceOrientationLandscapeRight) {
+        overlayFrame = CGRectMake(CGRectGetWidth(frame) - AGPhotoBrowserOverlayInitialHeight, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame));
+    } else {
+        overlayFrame = CGRectMake(0, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame));
+    }
+    
+    [UIView animateWithDuration:0.15
+                     animations:^(){
+                         self.frame = overlayFrame;
+                     }];
 }
 
 
@@ -187,15 +188,25 @@
 	if ([_delegate respondsToSelector:@selector(sharingView:didTapOnSeeMoreButton:)]) {
 		[_delegate sharingView:self didTapOnSeeMoreButton:sender];
 	}
-    // -- TAKE INTO ACCOUNT ORIENTATION!
+    
     self.descriptionExpanded = YES;
     
     CGSize newDescriptionSize = [self p_sizeForDescriptionLabel];
     
     CGRect currentOverlayFrame = self.frame;
-    int newSharingHeight = CGRectGetHeight(currentOverlayFrame) - 20 + newDescriptionSize.height;
-    currentOverlayFrame.size.height = newSharingHeight;
-    currentOverlayFrame.origin.y -= (newSharingHeight - CGRectGetHeight(self.bounds));
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationPortraitUpsideDown) {
+        int newSharingHeight = CGRectGetHeight(currentOverlayFrame) - 20 + newDescriptionSize.height;
+        currentOverlayFrame.size.height = newSharingHeight;
+        currentOverlayFrame.origin.y -= (newSharingHeight - CGRectGetHeight(self.bounds));
+    } else if (orientation == UIDeviceOrientationLandscapeRight) {
+        int newSharingWidth = CGRectGetWidth(currentOverlayFrame) - 20 + newDescriptionSize.height;
+        currentOverlayFrame.origin.x -= (newSharingWidth - CGRectGetWidth(currentOverlayFrame));
+        currentOverlayFrame.size.width = newSharingWidth;
+    } else {
+        int newSharingWidth = CGRectGetWidth(currentOverlayFrame) - 20 + newDescriptionSize.height;
+        currentOverlayFrame.size.width = newSharingWidth;
+    }
     
     [UIView animateWithDuration:AGPhotoBrowserAnimationDuration
                      animations:^(){
