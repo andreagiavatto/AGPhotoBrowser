@@ -9,7 +9,6 @@
 #import "AGPhotoBrowserOverlayView.h"
 
 #import <QuartzCore/QuartzCore.h>
-#import "AGPhotoBrowserOverlayGradientView.h"
 
 @interface AGPhotoBrowserOverlayView () {
 	BOOL _animated;
@@ -18,7 +17,6 @@
 }
 
 @property (nonatomic, strong) UIView *sharingView;
-@property (nonatomic, strong) AGPhotoBrowserOverlayGradientView *gradientView;
 @property (nonatomic, assign) BOOL descriptionExpanded;
 @property (nonatomic, strong) UITapGestureRecognizer *tapGesture;
 
@@ -60,16 +58,16 @@
 			descriptionSize = [_description sizeWithFont:self.descriptionLabel.font  constrainedToSize:CGSizeMake(CGRectGetWidth(self.bounds) - 85, MAXFLOAT)];
 		} else {
 			NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
-			CGRect descriptionBoundingRect = [_description boundingRectWithSize:CGSizeMake(CGRectGetWidth(self.bounds) - 65, MAXFLOAT)
+			CGRect descriptionBoundingRect = [_description boundingRectWithSize:CGSizeMake(CGRectGetWidth(self.bounds) - 85, MAXFLOAT)
 																					  options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
 																					  context:nil];
 			descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
 		}
-		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, descriptionSize.width, descriptionSize.height);
+		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, CGRectGetWidth(self.bounds) - 85, descriptionSize.height);
 	} else {
 		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, CGRectGetWidth(self.bounds) - 85, 20);
-		self.seeMoreButton.frame = CGRectMake(240, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, 65, 20);
 	}
+	self.seeMoreButton.frame = CGRectMake(20 + CGRectGetMinX(self.descriptionLabel.frame) + CGRectGetWidth(self.descriptionLabel.frame) - 65, CGRectGetMinY(self.descriptionLabel.frame) + CGRectGetHeight(self.descriptionLabel.frame), 65, 20);
     
 	if ([self.descriptionLabel.text length]) {
 		CGSize descriptionSize;
@@ -82,7 +80,7 @@
 																				   context:nil];
 			descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
 		}
-        if (descriptionSize.height > self.descriptionLabel.frame.size.height) {
+        if (descriptionSize.height > CGRectGetHeight(self.descriptionLabel.frame)) {
             self.seeMoreButton.hidden = NO;
         } else {
             self.seeMoreButton.hidden = YES;
@@ -272,17 +270,6 @@
 	}
 	
 	return _sharingView;
-}
-
-- (AGPhotoBrowserOverlayGradientView *)gradientView
-{
-    if (!_gradientView) {
-        _gradientView = [[AGPhotoBrowserOverlayGradientView alloc] initWithFrame:CGRectZero];
-        //_gradientView.translatesAutoresizingMaskIntoConstraints = NO;
-        _gradientView.layer.colors = [NSArray arrayWithObjects:(id)[[UIColor clearColor] CGColor], (id)[[UIColor blackColor] CGColor], nil];
-    }
-    
-    return _gradientView;
 }
 
 - (UILabel *)titleLabel
