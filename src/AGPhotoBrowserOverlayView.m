@@ -54,45 +54,40 @@
     self.titleLabel.frame = CGRectMake(20, 30, CGRectGetWidth(self.bounds) - 40, 20);
 	// -- Separator
     self.separatorView.frame = CGRectMake(20, CGRectGetMinY(self.titleLabel.frame) + CGRectGetHeight(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), 1);
+    // -- Action
+    self.actionButton.frame = CGRectMake(CGRectGetWidth(self.bounds) - 55 - 5, CGRectGetHeight(self.bounds) - 32 - 5, 55, 32);
+    // -- See more
+	self.seeMoreButton.frame = CGRectMake(CGRectGetWidth(self.bounds) - CGRectGetWidth(self.actionButton.frame) - 60 - 5, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 5, 60, 20);
     // -- Description
+    CGSize descriptionSize = [self p_sizeForDescriptionLabel];
     CGFloat descriptionHeight = 20;
 	if (self.descriptionExpanded) {
-		CGSize descriptionSize;
-		if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
-			descriptionSize = [_description sizeWithFont:self.descriptionLabel.font  constrainedToSize:CGSizeMake(CGRectGetWidth(self.bounds) - 85, MAXFLOAT)];
-		} else {
-			NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
-			CGRect descriptionBoundingRect = [_description boundingRectWithSize:CGSizeMake(CGRectGetWidth(self.bounds) - 85, MAXFLOAT)
-																					  options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
-																					  context:nil];
-			descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
-		}
 		descriptionHeight = descriptionSize.height;
 	}
-    self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 5, CGRectGetWidth(self.bounds) - 85, descriptionHeight);
-    // -- See more
-	self.seeMoreButton.frame = CGRectMake(20 + CGRectGetMinX(self.descriptionLabel.frame) + CGRectGetWidth(self.descriptionLabel.frame) - 65, CGRectGetMinY(self.descriptionLabel.frame) + CGRectGetHeight(self.descriptionLabel.frame), 65, 20);
-    // -- Action
-    self.actionButton.frame = CGRectMake(CGRectGetWidth(self.bounds) - 55 - 10, CGRectGetHeight(self.bounds) - 32 - 5, 55, 32);
+    self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 5, descriptionSize.width, descriptionHeight);
     
     // -- Controls visibility
 	if ([self.descriptionLabel.text length]) {
-		CGSize descriptionSize;
-		if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
-			descriptionSize = [self.descriptionLabel.text sizeWithFont:self.descriptionLabel.font  constrainedToSize:CGSizeMake(self.descriptionLabel.frame.size.width, MAXFLOAT)];
-		} else {
-			NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
-			CGRect descriptionBoundingRect = [self.descriptionLabel.text boundingRectWithSize:CGSizeMake(self.descriptionLabel.frame.size.width, MAXFLOAT)
-																				   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
-																				   context:nil];
-			descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
-		}
-        if (descriptionSize.height > CGRectGetHeight(self.descriptionLabel.frame)) {
-            self.seeMoreButton.hidden = NO;
-        } else {
-            self.seeMoreButton.hidden = YES;
-        }
         self.descriptionLabel.hidden = NO;
+        if (self.descriptionExpanded) {
+            self.seeMoreButton.hidden = YES;
+        } else {
+            CGSize descriptionTextSize;
+            if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
+                descriptionTextSize = [self.descriptionLabel.text sizeWithFont:self.descriptionLabel.font  constrainedToSize:CGSizeMake(descriptionSize.width, MAXFLOAT)];
+            } else {
+                NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
+                CGRect descriptionBoundingRect = [self.descriptionLabel.text boundingRectWithSize:CGSizeMake(descriptionSize.width, MAXFLOAT)
+                                                                                          options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
+                                                                                          context:nil];
+                descriptionTextSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
+            }
+            if (descriptionTextSize.height > CGRectGetHeight(self.descriptionLabel.frame)) {
+                self.seeMoreButton.hidden = NO;
+            } else {
+                self.seeMoreButton.hidden = YES;
+            }
+        }
     } else {
         self.descriptionLabel.hidden = YES;
         self.seeMoreButton.hidden = YES;
@@ -132,6 +127,8 @@
 
 - (void)resetOverlayView
 {
+    self.descriptionExpanded = NO;
+    
 	if (floor(CGRectGetHeight(self.bounds)) != AGPhotoBrowserOverlayInitialHeight) {
 		__block CGRect initialSharingFrame = self.frame;
 		initialSharingFrame.origin.y = round(CGRectGetHeight([UIScreen mainScreen].bounds) - AGPhotoBrowserOverlayInitialHeight);
@@ -141,8 +138,6 @@
 							 self.frame = initialSharingFrame;
 						 } completion:^(BOOL finished){
 							 initialSharingFrame.size.height = AGPhotoBrowserOverlayInitialHeight;
-							 self.descriptionExpanded = NO;
-							 [self setNeedsLayout];
 							 [UIView animateWithDuration:AGPhotoBrowserAnimationDuration
 											  animations:^(){
 												  self.frame = initialSharingFrame;
@@ -151,6 +146,32 @@
 	}
 }
 
+
+#pragma mark - Private methods
+#pragma mark -
+
+- (CGSize)p_sizeForDescriptionLabel
+{
+    CGFloat newDescriptionWidth;
+    if (self.descriptionExpanded) {
+        newDescriptionWidth = CGRectGetWidth(self.bounds) - 20 - CGRectGetWidth(self.actionButton.frame) - 10; // H:|-(==20)-[_descriptionLabel]-(==5)-[_actionButton]-(==5)-|
+    } else {
+        newDescriptionWidth = CGRectGetWidth(self.bounds) - 20 - 5 - CGRectGetWidth(self.seeMoreButton.frame) - CGRectGetWidth(self.actionButton.frame) - 5; // H:|-(==20)-[_descriptionLabel]-(==5)-[_seeMoreButton][_actionButton]-(==5)-|
+    }
+    
+    CGSize descriptionSize;
+    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
+        descriptionSize = [self.description sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(newDescriptionWidth, MAXFLOAT)];
+    } else {
+        NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
+        CGRect descriptionBoundingRect = [self.description boundingRectWithSize:CGSizeMake(newDescriptionWidth, MAXFLOAT)
+                                                                        options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
+                                                                        context:nil];
+        descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
+    }
+    
+    return descriptionSize;
+}
 
 #pragma mark - Buttons
 
@@ -166,20 +187,13 @@
 	if ([_delegate respondsToSelector:@selector(sharingView:didTapOnSeeMoreButton:)]) {
 		[_delegate sharingView:self didTapOnSeeMoreButton:sender];
 	}
+    // -- TAKE INTO ACCOUNT ORIENTATION!
+    self.descriptionExpanded = YES;
     
-    CGSize descriptionSize;
-    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
-        descriptionSize = [self.description sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(CGRectGetWidth(self.descriptionLabel.frame), MAXFLOAT)];
-    } else {
-        NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
-        CGRect descriptionBoundingRect = [self.description boundingRectWithSize:CGSizeMake(CGRectGetWidth(self.descriptionLabel.frame), MAXFLOAT)
-                                                                        options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
-                                                                        context:nil];
-        descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
-    }
+    CGSize newDescriptionSize = [self p_sizeForDescriptionLabel];
     
     CGRect currentOverlayFrame = self.frame;
-    int newSharingHeight = CGRectGetHeight(currentOverlayFrame) -20 + ceil(descriptionSize.height);
+    int newSharingHeight = CGRectGetHeight(currentOverlayFrame) - 20 + newDescriptionSize.height;
     currentOverlayFrame.size.height = newSharingHeight;
     currentOverlayFrame.origin.y -= (newSharingHeight - CGRectGetHeight(self.bounds));
     
@@ -187,8 +201,6 @@
                      animations:^(){
                          self.frame = currentOverlayFrame;
                      }];
-    
-    self.descriptionExpanded = YES;
     
     [self.sharingView addGestureRecognizer:self.tapGesture];
 }

@@ -40,12 +40,12 @@
 	  @{
 		  @"Image": SAMPLE_IMAGE_2,
 		  @"Title" : @"Drop on a leaf",
-		  @"Description" : @"A very long and meaningful description about a drop on a leaf.\n\nThis description is so interesting that i am never bored reading it!\n\nI could go on and on and on and on and on and on..."
+		  @"Description" : @"A very long and meaningful description about a drop on a leaf that spans on multiple lines.\n\nThis description is so interesting that i am never bored reading it!\n\nI could go on and on and on and on and on and on..."
 	},
 	  @{
 		  @"Image": SAMPLE_IMAGE_3,
 		  @"Title" : @"Rainbow flower",
-		  @"Description" : @"A colorful image"
+		  @"Description" : @"A colorful image with a meaningless long description for testing purposes."
 	}
 	];
 }
