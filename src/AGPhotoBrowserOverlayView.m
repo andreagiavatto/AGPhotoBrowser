@@ -165,32 +165,32 @@
 {
 	if ([_delegate respondsToSelector:@selector(sharingView:didTapOnSeeMoreButton:)]) {
 		[_delegate sharingView:self didTapOnSeeMoreButton:sender];
-        
-        CGSize descriptionSize;
-        if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
-            descriptionSize = [self.description sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(CGRectGetWidth(self.descriptionLabel.frame), MAXFLOAT)];
-        } else {
-            NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
-            CGRect descriptionBoundingRect = [self.description boundingRectWithSize:CGSizeMake(CGRectGetWidth(self.descriptionLabel.frame), MAXFLOAT)
-                                                                                   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
-                                                                                   context:nil];
-            descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
-        }
-        
-        CGRect currentOverlayFrame = self.frame;
-        int newSharingHeight = CGRectGetHeight(currentOverlayFrame) -20 + ceil(descriptionSize.height);
-        currentOverlayFrame.size.height = newSharingHeight;
-        currentOverlayFrame.origin.y -= (newSharingHeight - CGRectGetHeight(self.bounds));
-        
-        [UIView animateWithDuration:AGPhotoBrowserAnimationDuration
-                         animations:^(){
-                             self.frame = currentOverlayFrame;
-                         }];
-        
-		self.descriptionExpanded = YES;
-		
-		[self.sharingView addGestureRecognizer:self.tapGesture];
 	}
+    
+    CGSize descriptionSize;
+    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
+        descriptionSize = [self.description sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(CGRectGetWidth(self.descriptionLabel.frame), MAXFLOAT)];
+    } else {
+        NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
+        CGRect descriptionBoundingRect = [self.description boundingRectWithSize:CGSizeMake(CGRectGetWidth(self.descriptionLabel.frame), MAXFLOAT)
+                                                                        options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
+                                                                        context:nil];
+        descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
+    }
+    
+    CGRect currentOverlayFrame = self.frame;
+    int newSharingHeight = CGRectGetHeight(currentOverlayFrame) -20 + ceil(descriptionSize.height);
+    currentOverlayFrame.size.height = newSharingHeight;
+    currentOverlayFrame.origin.y -= (newSharingHeight - CGRectGetHeight(self.bounds));
+    
+    [UIView animateWithDuration:AGPhotoBrowserAnimationDuration
+                     animations:^(){
+                         self.frame = currentOverlayFrame;
+                     }];
+    
+    self.descriptionExpanded = YES;
+    
+    [self.sharingView addGestureRecognizer:self.tapGesture];
 }
 
 
