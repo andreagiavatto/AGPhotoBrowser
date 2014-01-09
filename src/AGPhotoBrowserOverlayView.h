@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 static const CGFloat AGPhotoBrowserAnimationDuration = 0.25;
-static const NSInteger AGPhotoBrowserOverlayInitialHeight = 120;
+static const NSInteger AGPhotoBrowserOverlayInitialHeight = 100;
 
 @class AGPhotoBrowserOverlayView;
 
@@ -33,9 +33,7 @@ static const NSInteger AGPhotoBrowserOverlayInitialHeight = 120;
 
 @property (nonatomic, assign, readonly, getter = isVisible) BOOL visible;
 
-- (void)showOverlayAnimated:(BOOL)animated;
-- (void)hideOverlayAnimated:(BOOL)animated;
-
+- (void)setOverlayVisible:(BOOL)visible animated:(BOOL)animated;
 - (void)resetOverlayView;
 
 @end

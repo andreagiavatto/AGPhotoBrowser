@@ -8,6 +8,13 @@
 
 #import "AGPhotoBrowserZoomableView.h"
 
+
+@interface AGPhotoBrowserZoomableView ()
+
+@property (nonatomic, strong, readwrite) UIImageView *imageView;
+
+@end
+
 @implementation AGPhotoBrowserZoomableView
 
 - (id)initWithFrame:(CGRect)frame
@@ -19,7 +26,7 @@
         self.imageView = [[UIImageView alloc] initWithFrame:frame];
         self.imageView.contentMode = UIViewContentModeScaleAspectFit;
         self.imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        self.frame = frame;
+        //self.frame = frame;
         
         self.minimumZoomScale = 1.0f;
         self.maximumZoomScale = 5.0f;
@@ -63,8 +70,7 @@
         [UIView animateWithDuration:0.35 animations:^{
             self.zoomScale = 1.0f;
         }];
-    }
-    else {
+    } else {
         [UIView animateWithDuration:0.35 animations:^{
             CGPoint point = [recognizer locationInView:self];
             [self zoomToRect:CGRectMake(point.x, point.y, 0, 0) animated:YES];

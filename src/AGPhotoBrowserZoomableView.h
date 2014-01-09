@@ -16,10 +16,12 @@
 
 @end
 
+
 @interface AGPhotoBrowserZoomableView : UIScrollView <UIScrollViewDelegate>
 
 @property (nonatomic, weak) id<AGPhotoBrowserZoomableViewDelegate> zoomableDelegate;
-@property (nonatomic, strong) UIImageView *imageView;
+@property (nonatomic, strong, readonly) UIImageView *imageView;
+
 - (void)setImage:(UIImage *)image;
 
 @end

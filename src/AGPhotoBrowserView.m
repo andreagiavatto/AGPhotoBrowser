@@ -158,10 +158,10 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	CGFloat newAlpha;
 	
 	if (_displayingDetailedView) {
-		[self.overlayView showOverlayAnimated:YES];
+		[self.overlayView setOverlayVisible:YES animated:YES];
 		newAlpha = 1.;
 	} else {
-		[self.overlayView hideOverlayAnimated:YES];
+		[self.overlayView setOverlayVisible:NO animated:YES];
 		newAlpha = 0.;
 	}
 	
@@ -209,8 +209,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
 		cell.delegate = self;
     }
-    //NSLog(@"Table frame %@", NSStringFromCGRect(tableView.frame));
-    //NSLog(@"Cell frame %@", NSStringFromCGRect(cell.frame));
+
     [self configureCell:cell forRowAtIndexPath:indexPath];
     
     return cell;
@@ -284,19 +283,19 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     _currentlySelectedIndex = index;
 	
     if ([self.dataSource respondsToSelector:@selector(photoBrowser:willDisplayActionButtonAtIndex:)]) {
-        self.overlayView.actionButton.hidden = ![self.dataSource photoBrowser:self willDisplayActionButtonAtIndex:index];
+        self.overlayView.actionButton.hidden = ![self.dataSource photoBrowser:self willDisplayActionButtonAtIndex:_currentlySelectedIndex];
     } else {
         self.overlayView.actionButton.hidden = NO;
     }
     
 	if ([_dataSource respondsToSelector:@selector(photoBrowser:titleForImageAtIndex:)]) {
-		self.overlayView.title = [_dataSource photoBrowser:self titleForImageAtIndex:index];
+		self.overlayView.title = [_dataSource photoBrowser:self titleForImageAtIndex:_currentlySelectedIndex];
 	} else {
         self.overlayView.title = @"";
     }
 	
 	if ([_dataSource respondsToSelector:@selector(photoBrowser:descriptionForImageAtIndex:)]) {
-		self.overlayView.description = [_dataSource photoBrowser:self descriptionForImageAtIndex:index];
+		self.overlayView.description = [_dataSource photoBrowser:self descriptionForImageAtIndex:_currentlySelectedIndex];
 	} else {
         self.overlayView.description = @"";
     }
@@ -366,30 +365,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	if ([_delegate respondsToSelector:@selector(photoBrowser:didTapOnActionButton:atIndex:)]) {
 		[_delegate photoBrowser:self didTapOnActionButton:actionButton atIndex:_currentlySelectedIndex];
 	}
-}
-
-- (void)sharingView:(AGPhotoBrowserOverlayView *)sharingView didTapOnSeeMoreButton:(UIButton *)actionButton
-{
-	/*CGSize descriptionSize;
-	if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
-		descriptionSize = [sharingView.description sizeWithFont:sharingView.descriptionLabel.font constrainedToSize:CGSizeMake(CGRectGetWidth(sharingView.descriptionLabel.frame), MAXFLOAT)];
-	} else {
-		NSDictionary *textAttributes = @{NSFontAttributeName : sharingView.descriptionLabel.font};
-		CGRect descriptionBoundingRect = [sharingView.description boundingRectWithSize:CGSizeMake(CGRectGetWidth(sharingView.descriptionLabel.frame), MAXFLOAT)
-																			   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
-																			   context:nil];
-		descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
-	}
-	
-	CGRect currentOverlayFrame = self.overlayView.frame;
-	int newSharingHeight = CGRectGetHeight(currentOverlayFrame) -20 + ceil(descriptionSize.height);
-    currentOverlayFrame.size.height = newSharingHeight;
-    currentOverlayFrame.origin.y = self.cellHeight - newSharingHeight;
-	
-	[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
-					 animations:^(){
-						 self.overlayView.frame = currentOverlayFrame;//CGRectMake(0, floor(CGRectGetHeight(self.frame) - newSharingHeight), CGRectGetWidth(self.frame), newSharingHeight);
-					 }];*/
 }
 
 

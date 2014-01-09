@@ -46,12 +46,16 @@
 {
 	[super layoutSubviews];
     
-    // -- Sharing view
+    // -- Gradient layer
     _gradientLayer.frame = self.bounds;
+    // -- Sharing view
     self.sharingView.frame = CGRectMake(0, 0, CGRectGetWidth(self.bounds), CGRectGetHeight(self.bounds));
-	self.titleLabel.frame = CGRectMake(20, 35, CGRectGetWidth(self.bounds) - 40, 20);
-	self.separatorView.frame = CGRectMake(20, CGRectGetMinY(self.titleLabel.frame) + CGRectGetHeight(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), 1);
-    
+	// -- Title
+    self.titleLabel.frame = CGRectMake(20, 30, CGRectGetWidth(self.bounds) - 40, 20);
+	// -- Separator
+    self.separatorView.frame = CGRectMake(20, CGRectGetMinY(self.titleLabel.frame) + CGRectGetHeight(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), 1);
+    // -- Description
+    CGFloat descriptionHeight = 20;
 	if (self.descriptionExpanded) {
 		CGSize descriptionSize;
 		if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
@@ -63,12 +67,15 @@
 																					  context:nil];
 			descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
 		}
-		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, CGRectGetWidth(self.bounds) - 85, descriptionSize.height);
-	} else {
-		self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 10, CGRectGetWidth(self.bounds) - 85, 20);
+		descriptionHeight = descriptionSize.height;
 	}
+    self.descriptionLabel.frame = CGRectMake(20, CGRectGetMinY(self.separatorView.frame) + CGRectGetHeight(self.separatorView.frame) + 5, CGRectGetWidth(self.bounds) - 85, descriptionHeight);
+    // -- See more
 	self.seeMoreButton.frame = CGRectMake(20 + CGRectGetMinX(self.descriptionLabel.frame) + CGRectGetWidth(self.descriptionLabel.frame) - 65, CGRectGetMinY(self.descriptionLabel.frame) + CGRectGetHeight(self.descriptionLabel.frame), 65, 20);
+    // -- Action
+    self.actionButton.frame = CGRectMake(CGRectGetWidth(self.bounds) - 55 - 10, CGRectGetHeight(self.bounds) - 32 - 5, 55, 32);
     
+    // -- Controls visibility
 	if ([self.descriptionLabel.text length]) {
 		CGSize descriptionSize;
 		if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
@@ -98,8 +105,6 @@
 		self.titleLabel.hidden = YES;
 		self.separatorView.hidden = YES;
 	}
-	
-	self.actionButton.frame = CGRectMake(CGRectGetWidth(self.bounds) - 55 - 10, CGRectGetHeight(self.bounds) - 32 - 5, 55, 32);
 }
 
 - (void)setupView
@@ -119,16 +124,10 @@
 
 #pragma mark - Public methods
 
-- (void)showOverlayAnimated:(BOOL)animated
+- (void)setOverlayVisible:(BOOL)visible animated:(BOOL)animated
 {
-	_animated = animated;
-	self.visible = YES;
-}
-
-- (void)hideOverlayAnimated:(BOOL)animated
-{
-	_animated = animated;
-	self.visible = NO;
+    self.visible = visible;
+    _animated = animated;
 }
 
 - (void)resetOverlayView
@@ -185,7 +184,7 @@
         
         [UIView animateWithDuration:AGPhotoBrowserAnimationDuration
                          animations:^(){
-                             self.frame = currentOverlayFrame;//CGRectMake(0, floor(CGRectGetHeight(self.frame) - newSharingHeight), CGRectGetWidth(self.frame), newSharingHeight);
+                             self.frame = currentOverlayFrame;
                          }];
         
 		self.descriptionExpanded = YES;
@@ -260,13 +259,10 @@
 {
 	if (!_sharingView) {
 		_sharingView = [[UIView alloc] initWithFrame:CGRectZero];
-        //_sharingView.translatesAutoresizingMaskIntoConstraints = NO;
         _gradientLayer = [CAGradientLayer layer];
 		_gradientLayer.frame = self.bounds;
 		_gradientLayer.colors = [NSArray arrayWithObjects:(id)[[UIColor clearColor] CGColor], (id)[[UIColor blackColor] CGColor], nil];
 		[_sharingView.layer insertSublayer:_gradientLayer atIndex:0];
-        
-        //[_sharingView addSubview:self.gradientView];
 	}
 	
 	return _sharingView;
@@ -276,7 +272,6 @@
 {
 	if (!_titleLabel) {
 		_titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        //_titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
 		_titleLabel.textColor = [UIColor colorWithWhite:0.9 alpha:0.9];
 		_titleLabel.font = [UIFont boldSystemFontOfSize:14];
 		_titleLabel.backgroundColor = [UIColor clearColor];
@@ -289,9 +284,8 @@
 {
 	if (!_separatorView) {
 		_separatorView = [[UIView alloc] initWithFrame:CGRectZero];
-        //_separatorView.translatesAutoresizingMaskIntoConstraints = NO;
 		_separatorView.backgroundColor = [UIColor lightGrayColor];
-        //_separatorView.hidden = YES;
+        _separatorView.hidden = YES;
 	}
 	
 	return _separatorView;
@@ -301,7 +295,6 @@
 {
 	if (!_descriptionLabel) {
 		_descriptionLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        //_descriptionLabel.translatesAutoresizingMaskIntoConstraints = NO;
 		_descriptionLabel.textColor = [UIColor colorWithWhite:0.9 alpha:0.9];
 		_descriptionLabel.font = [UIFont systemFontOfSize:13];
 		_descriptionLabel.backgroundColor = [UIColor clearColor];
@@ -315,12 +308,11 @@
 {
 	if (!_seeMoreButton) {
 		_seeMoreButton = [[UIButton alloc] initWithFrame:CGRectZero];
-        //_seeMoreButton.translatesAutoresizingMaskIntoConstraints = NO;
 		[_seeMoreButton setTitle:NSLocalizedString(@"See More", @"Title for See more button") forState:UIControlStateNormal];
 		[_seeMoreButton setBackgroundColor:[UIColor clearColor]];
 		[_seeMoreButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
 		_seeMoreButton.titleLabel.font = [UIFont boldSystemFontOfSize:13];
-        //_seeMoreButton.hidden = YES;
+        _seeMoreButton.hidden = YES;
 		
 		[_seeMoreButton addTarget:self action:@selector(p_seeMoreButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 	}
@@ -332,7 +324,6 @@
 {
 	if (!_actionButton) {
 		_actionButton = [[UIButton alloc] initWithFrame:CGRectZero];
-        //_actionButton.translatesAutoresizingMaskIntoConstraints = NO;
 		[_actionButton setTitle:NSLocalizedString(@"● ● ●", @"Title for Action button") forState:UIControlStateNormal];
 		[_actionButton setBackgroundColor:[UIColor clearColor]];
 		[_actionButton setTitleColor:[UIColor colorWithWhite:0.9 alpha:0.9] forState:UIControlStateNormal];
