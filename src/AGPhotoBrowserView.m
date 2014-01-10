@@ -461,7 +461,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	CGRect doneFrame = CGRectZero;
     
     // -- Update table
-    self.photoTableView.scrollEnabled = NO;
 	[self setTableIfNotEqualTransform:viewTransform frame:frame];
 	
     if (UIInterfaceOrientationIsPortrait(orientation)) {

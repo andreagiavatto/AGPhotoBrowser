@@ -26,7 +26,6 @@
         self.imageView = [[UIImageView alloc] initWithFrame:frame];
         self.imageView.contentMode = UIViewContentModeScaleAspectFit;
         self.imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        //self.frame = frame;
         
         self.minimumZoomScale = 1.0f;
         self.maximumZoomScale = 5.0f;
@@ -54,10 +53,8 @@
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (!self.dragging) {
-        if ([self.zoomableDelegate respondsToSelector:@selector(didDoubleTapZoomableView:)]) {
-            [self.zoomableDelegate didDoubleTapZoomableView:self];
-        }
+    if ([self.zoomableDelegate respondsToSelector:@selector(didDoubleTapZoomableView:)]) {
+        [self.zoomableDelegate didDoubleTapZoomableView:self];
     }
 }
 
