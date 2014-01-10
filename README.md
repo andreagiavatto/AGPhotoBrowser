@@ -9,6 +9,9 @@ It currently supports:
 - Any number of images through a data source
 - Optional title and description (with support for long description through a 'See more' button)
 - Full screen view
+- Pinch to zoom in/out
+- Double tap to zoom in/out
+- Orientation changes
 - "Swipe up/down" to hide the photo browser
 - "Done/Action buttons" to dismiss the browser or perform a few operations on the selected image
 
@@ -16,7 +19,7 @@ It currently supports:
 
 ## Install
 The suggested way to install the component is using [CocoaPods](http://cocoapods.org/), just include the following line in your Podfile:
-`pod "AGPhotoBrowser", "~> 1.0.3"`
+`pod "AGPhotoBrowser", "~> 1.0.6"`
 
 
 ## Usage
@@ -29,8 +32,8 @@ There is a demo project included that shows how to use the photo browser.
 - dismiss the photo browser with a completion block calling `- (void)hideWithCompletion:( void (^) (BOOL finished) )completionBlock`
 
 ## TO-DO
-- ~~add pinch to zoom gesture on images~~ (thanks @dtsolis)
-- support orientation changes
+- ~~add pinch to zoom gesture on images~~ (from 1.0.4, thanks @dtsolis)
+- ~~support orientation changes~~ (from 1.0.6)
 
 ## Resources
 
