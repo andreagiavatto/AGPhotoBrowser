@@ -32,6 +32,7 @@ static const NSInteger AGPhotoBrowserOverlayInitialHeight = 100;
 @property (nonatomic, strong, readonly) UILabel *descriptionLabel;
 
 @property (nonatomic, assign, readonly, getter = isVisible) BOOL visible;
+@property (nonatomic, assign, readonly) BOOL descriptionExpanded;
 
 - (void)setOverlayVisible:(BOOL)visible animated:(BOOL)animated;
 - (void)resetOverlayView;

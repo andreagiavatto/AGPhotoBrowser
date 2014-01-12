@@ -50,8 +50,8 @@
 {
     // -- Force the right frame
     CGRect correctFrame = frame;
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    if (UIInterfaceOrientationIsPortrait(orientation)) {
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIDeviceOrientationIsPortrait(orientation)) {
         correctFrame.size.width = CGRectGetHeight([[UIScreen mainScreen] bounds]);
         correctFrame.size.height = CGRectGetWidth([[UIScreen mainScreen] bounds]);
     } else {

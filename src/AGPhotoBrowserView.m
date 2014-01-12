@@ -143,8 +143,9 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (CGFloat)cellHeight
 {
-	UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-	if (UIInterfaceOrientationIsLandscape(orientation)) {
+	//UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+	UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+	if (UIDeviceOrientationIsLandscape(orientation)) {
 		return CGRectGetHeight(self.currentWindow.frame);
 	}
 	
@@ -385,7 +386,20 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		self.photoTableView.scrollEnabled = YES;
 		// -- Check if user dismissed the view
 		CGPoint endingPanPoint = [recognizer translationInView:self];
-		CGPoint translatedPoint = CGPointMake(_startingPanPoint.x - endingPanPoint.y, _startingPanPoint.y);
+		/*CGPoint translatedPoint = CGPointMake(_startingPanPoint.x - endingPanPoint.y, _startingPanPoint.y);
+		int heightDifference = abs(floor(_startingPanPoint.x - translatedPoint.x));*/
+		UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+		CGPoint translatedPoint;
+		
+        if (UIDeviceOrientationIsPortrait(orientation)) {
+            translatedPoint = CGPointMake(_startingPanPoint.x - endingPanPoint.y, _startingPanPoint.y);
+        } else if (orientation == UIDeviceOrientationLandscapeLeft) {
+            translatedPoint = CGPointMake(_startingPanPoint.x + endingPanPoint.x, _startingPanPoint.y);
+        } else {
+            translatedPoint = CGPointMake(_startingPanPoint.x - endingPanPoint.x, _startingPanPoint.y);
+        }
+		
+		imageView.center = translatedPoint;
 		int heightDifference = abs(floor(_startingPanPoint.x - translatedPoint.x));
 		
 		if (heightDifference <= AGPhotoBrowserThresholdToCenter) {
@@ -412,12 +426,12 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	} else {
 		CGPoint middlePanPoint = [recognizer translationInView:self];
 		
-		UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+		UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
 		CGPoint translatedPoint;
 		
-        if (UIInterfaceOrientationIsPortrait(orientation)) {
+        if (UIDeviceOrientationIsPortrait(orientation)) {
             translatedPoint = CGPointMake(_startingPanPoint.x - middlePanPoint.y, _startingPanPoint.y);
-        } else if (orientation == UIInterfaceOrientationLandscapeRight) {
+        } else if (orientation == UIDeviceOrientationLandscapeLeft) {
             translatedPoint = CGPointMake(_startingPanPoint.x + middlePanPoint.x, _startingPanPoint.y);
         } else {
             translatedPoint = CGPointMake(_startingPanPoint.x - middlePanPoint.x, _startingPanPoint.y);
@@ -447,36 +461,39 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 - (void)statusBarDidChangeFrame:(NSNotification *)notification
 {
     // -- Get the device orientation
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
     
     _changingOrientation = YES;
     
     CGFloat angleTable = UIInterfaceOrientationAngleOfOrientation(orientation);
     CGFloat angleOverlay = UIInterfaceOrientationAngleOfOrientationForOverlay(orientation);
-    CGAffineTransform viewTransform = CGAffineTransformMakeRotation(angleTable);
+    CGAffineTransform tableTransform = CGAffineTransformMakeRotation(angleTable);
     CGAffineTransform overlayTransform = CGAffineTransformMakeRotation(angleOverlay);
     
-    CGRect frame = [UIScreen mainScreen].bounds;
+    CGRect tableFrame = [UIScreen mainScreen].bounds;
     CGRect overlayFrame = CGRectZero;
 	CGRect doneFrame = CGRectZero;
     
     // -- Update table
-	[self setTableIfNotEqualTransform:viewTransform frame:frame];
+	[self setTransform:tableTransform andFrame:tableFrame forView:self.photoTableView];
 	
-    if (UIInterfaceOrientationIsPortrait(orientation)) {
-        overlayFrame = CGRectMake(0, CGRectGetHeight(frame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(frame), AGPhotoBrowserOverlayInitialHeight);
-		doneFrame = CGRectMake(CGRectGetWidth(frame) - 60 - 10, 15, 60, 32);
-    } else if (orientation == UIInterfaceOrientationLandscapeRight) {
-        overlayFrame = CGRectMake(0, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame));
-		doneFrame = CGRectMake(CGRectGetWidth(frame) - 32 - 15, CGRectGetHeight(frame) - 10 - 60, 32, 60);
+    if (UIDeviceOrientationIsPortrait(orientation)) {
+        overlayFrame = CGRectMake(0, CGRectGetHeight(tableFrame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(tableFrame), AGPhotoBrowserOverlayInitialHeight);
+		doneFrame = CGRectMake(CGRectGetWidth(tableFrame) - 60 - 10, 15, 60, 32);
+    } else if (orientation == UIDeviceOrientationLandscapeLeft) {
+        overlayFrame = CGRectMake(0, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(tableFrame));
+		doneFrame = CGRectMake(CGRectGetWidth(tableFrame) - 32 - 15, CGRectGetHeight(tableFrame) - 10 - 60, 32, 60);
     } else {
-        overlayFrame = CGRectMake(CGRectGetWidth(frame) - AGPhotoBrowserOverlayInitialHeight, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame));
+        overlayFrame = CGRectMake(CGRectGetWidth(tableFrame) - AGPhotoBrowserOverlayInitialHeight, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(tableFrame));
         doneFrame = CGRectMake(15, 10, 32, 60);
     }
     // -- Update overlay
-    [self setOverlayIfNotEqualTransform:overlayTransform frame:overlayFrame];
+	[self setTransform:overlayTransform andFrame:overlayFrame forView:self.overlayView];
+	if (self.overlayView.descriptionExpanded) {
+		[self.overlayView resetOverlayView];
+	}
     // -- Update done button
-    [self setDoneButtonIfNotEqualTransform:overlayTransform frame:doneFrame];
+	[self setTransform:overlayTransform andFrame:doneFrame forView:self.doneButton];
 
     [self.photoTableView reloadData];
 	[self.photoTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_currentlySelectedIndex inSection:0] atScrollPosition:UITableViewScrollPositionNone animated:NO];
@@ -484,48 +501,28 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     _changingOrientation = NO;
 }
 
-- (void)setOverlayIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame
+- (void)setTransform:(CGAffineTransform)transform andFrame:(CGRect)frame forView:(UIView *)view
 {
-    if (!CGAffineTransformEqualToTransform(self.overlayView.transform, transform)) {
-        self.overlayView.transform = transform;
+	if (!CGAffineTransformEqualToTransform(view.transform, transform)) {
+        view.transform = transform;
     }
-    if (!CGRectEqualToRect(self.overlayView.frame, frame)) {
-        self.overlayView.frame = frame;
+    if (!CGRectEqualToRect(view.frame, frame)) {
+        view.frame = frame;
     }
 }
 
-- (void)setTableIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame
-{
-    if (!CGAffineTransformEqualToTransform(self.photoTableView.transform, transform)) {
-        self.photoTableView.transform = transform;
-    }
-	if (!CGRectEqualToRect(self.photoTableView.frame, frame)) {
-        self.photoTableView.frame = frame;
-    }
-}
-
-- (void)setDoneButtonIfNotEqualTransform:(CGAffineTransform)transform frame:(CGRect)frame
-{
-    if (!CGAffineTransformEqualToTransform(self.doneButton.transform, transform)) {
-        self.doneButton.transform = transform;
-    }
-    if (!CGRectEqualToRect(self.doneButton.frame, frame)) {
-        self.doneButton.frame = frame;
-    }
-}
-
-CGFloat UIInterfaceOrientationAngleOfOrientation(UIInterfaceOrientation orientation)
+CGFloat UIInterfaceOrientationAngleOfOrientation(UIDeviceOrientation orientation)
 {
     CGFloat angle;
     
     switch (orientation) {
-        case UIInterfaceOrientationPortraitUpsideDown:
+        case UIDeviceOrientationPortraitUpsideDown:
             angle = -M_PI_2;
             break;
-        case UIInterfaceOrientationLandscapeRight:
+        case UIDeviceOrientationLandscapeLeft:
             angle = 0;
             break;
-        case UIInterfaceOrientationLandscapeLeft:
+        case UIDeviceOrientationLandscapeRight:
             angle = M_PI;
             break;
         default:
@@ -536,18 +533,18 @@ CGFloat UIInterfaceOrientationAngleOfOrientation(UIInterfaceOrientation orientat
     return angle;
 }
 
-CGFloat UIInterfaceOrientationAngleOfOrientationForOverlay(UIInterfaceOrientation orientation)
+CGFloat UIInterfaceOrientationAngleOfOrientationForOverlay(UIDeviceOrientation orientation)
 {
     CGFloat angle;
     
     switch (orientation) {
-        case UIInterfaceOrientationPortraitUpsideDown:
+        case UIDeviceOrientationPortraitUpsideDown:
             angle = 0;
             break;
-        case UIInterfaceOrientationLandscapeRight:
+        case UIDeviceOrientationLandscapeLeft:
             angle = M_PI_2;
             break;
-        case UIInterfaceOrientationLandscapeLeft:
+        case UIDeviceOrientationLandscapeRight:
             angle = -M_PI_2;
             break;
         default:

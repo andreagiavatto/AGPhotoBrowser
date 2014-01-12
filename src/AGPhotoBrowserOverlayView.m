@@ -17,7 +17,7 @@
 }
 
 @property (nonatomic, strong) UIView *sharingView;
-@property (nonatomic, assign) BOOL descriptionExpanded;
+@property (nonatomic, assign, readwrite) BOOL descriptionExpanded;
 @property (nonatomic, strong) UITapGestureRecognizer *tapGesture;
 
 @property (nonatomic, strong, readwrite) UILabel *titleLabel;
@@ -135,13 +135,13 @@
 {
     self.descriptionExpanded = NO;
     
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
     
     CGRect frame = self.superview.frame;
     CGRect overlayFrame = CGRectZero;
-    if (UIInterfaceOrientationIsPortrait(orientation)) {
+    if (UIDeviceOrientationIsPortrait(orientation)) {
         overlayFrame = CGRectMake(0, CGRectGetHeight(frame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(frame), AGPhotoBrowserOverlayInitialHeight);
-    } else if (orientation == UIInterfaceOrientationLandscapeRight) {
+    } else if (orientation == UIDeviceOrientationLandscapeLeft) {
         overlayFrame = CGRectMake(0, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame));
     } else {
         overlayFrame = CGRectMake(CGRectGetWidth(frame) - AGPhotoBrowserOverlayInitialHeight, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame));
@@ -200,12 +200,12 @@
     CGSize newDescriptionSize = [self p_sizeForDescriptionLabel];
     
     CGRect currentOverlayFrame = self.frame;
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    if (UIInterfaceOrientationIsPortrait(orientation)) {
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIDeviceOrientationIsPortrait(orientation)) {
         int newSharingHeight = CGRectGetHeight(currentOverlayFrame) - 20 + newDescriptionSize.height;
         currentOverlayFrame.size.height = newSharingHeight;
         currentOverlayFrame.origin.y -= (newSharingHeight - CGRectGetHeight(self.bounds));
-    } else if (orientation == UIInterfaceOrientationLandscapeRight) {
+    } else if (orientation == UIDeviceOrientationLandscapeLeft) {
         int newSharingWidth = CGRectGetWidth(currentOverlayFrame) - 20 + newDescriptionSize.height;
         currentOverlayFrame.size.width = newSharingWidth;
     } else {
