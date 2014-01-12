@@ -134,7 +134,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 - (AGPhotoBrowserOverlayView *)overlayView
 {
 	if (!_overlayView) {
-		_overlayView = [[AGPhotoBrowserOverlayView alloc] initWithFrame:CGRectZero/* CGRectMake(0, CGRectGetHeight(self.frame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(self.frame), AGPhotoBrowserOverlayInitialHeight)*/];
+		_overlayView = [[AGPhotoBrowserOverlayView alloc] initWithFrame:CGRectZero];
         _overlayView.delegate = self;
 	}
 	
@@ -386,8 +386,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		self.photoTableView.scrollEnabled = YES;
 		// -- Check if user dismissed the view
 		CGPoint endingPanPoint = [recognizer translationInView:self];
-		/*CGPoint translatedPoint = CGPointMake(_startingPanPoint.x - endingPanPoint.y, _startingPanPoint.y);
-		int heightDifference = abs(floor(_startingPanPoint.x - translatedPoint.x));*/
+
 		UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
 		CGPoint translatedPoint;
 		
@@ -462,43 +461,44 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 {
     // -- Get the device orientation
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    
-    _changingOrientation = YES;
-    
-    CGFloat angleTable = UIInterfaceOrientationAngleOfOrientation(orientation);
-    CGFloat angleOverlay = UIInterfaceOrientationAngleOfOrientationForOverlay(orientation);
-    CGAffineTransform tableTransform = CGAffineTransformMakeRotation(angleTable);
-    CGAffineTransform overlayTransform = CGAffineTransformMakeRotation(angleOverlay);
-    
-    CGRect tableFrame = [UIScreen mainScreen].bounds;
-    CGRect overlayFrame = CGRectZero;
-	CGRect doneFrame = CGRectZero;
-    
-    // -- Update table
-	[self setTransform:tableTransform andFrame:tableFrame forView:self.photoTableView];
-	
-    if (UIDeviceOrientationIsPortrait(orientation)) {
-        overlayFrame = CGRectMake(0, CGRectGetHeight(tableFrame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(tableFrame), AGPhotoBrowserOverlayInitialHeight);
-		doneFrame = CGRectMake(CGRectGetWidth(tableFrame) - 60 - 10, 15, 60, 32);
-    } else if (orientation == UIDeviceOrientationLandscapeLeft) {
-        overlayFrame = CGRectMake(0, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(tableFrame));
-		doneFrame = CGRectMake(CGRectGetWidth(tableFrame) - 32 - 15, CGRectGetHeight(tableFrame) - 10 - 60, 32, 60);
-    } else {
-        overlayFrame = CGRectMake(CGRectGetWidth(tableFrame) - AGPhotoBrowserOverlayInitialHeight, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(tableFrame));
-        doneFrame = CGRectMake(15, 10, 32, 60);
-    }
-    // -- Update overlay
-	[self setTransform:overlayTransform andFrame:overlayFrame forView:self.overlayView];
-	if (self.overlayView.descriptionExpanded) {
-		[self.overlayView resetOverlayView];
-	}
-    // -- Update done button
-	[self setTransform:overlayTransform andFrame:doneFrame forView:self.doneButton];
+	if (UIDeviceOrientationIsPortrait(orientation) || UIDeviceOrientationIsLandscape(orientation)) {
+		_changingOrientation = YES;
+		
+		CGFloat angleTable = UIInterfaceOrientationAngleOfOrientation(orientation);
+		CGFloat angleOverlay = UIInterfaceOrientationAngleOfOrientationForOverlay(orientation);
+		CGAffineTransform tableTransform = CGAffineTransformMakeRotation(angleTable);
+		CGAffineTransform overlayTransform = CGAffineTransformMakeRotation(angleOverlay);
+		
+		CGRect tableFrame = [UIScreen mainScreen].bounds;
+		CGRect overlayFrame = CGRectZero;
+		CGRect doneFrame = CGRectZero;
+		
+		// -- Update table
+		[self setTransform:tableTransform andFrame:tableFrame forView:self.photoTableView];
+		
+		if (UIDeviceOrientationIsPortrait(orientation)) {
+			overlayFrame = CGRectMake(0, CGRectGetHeight(tableFrame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(tableFrame), AGPhotoBrowserOverlayInitialHeight);
+			doneFrame = CGRectMake(CGRectGetWidth(tableFrame) - 60 - 10, 15, 60, 32);
+		} else if (orientation == UIDeviceOrientationLandscapeLeft) {
+			overlayFrame = CGRectMake(0, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(tableFrame));
+			doneFrame = CGRectMake(CGRectGetWidth(tableFrame) - 32 - 15, CGRectGetHeight(tableFrame) - 10 - 60, 32, 60);
+		} else {
+			overlayFrame = CGRectMake(CGRectGetWidth(tableFrame) - AGPhotoBrowserOverlayInitialHeight, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(tableFrame));
+			doneFrame = CGRectMake(15, 10, 32, 60);
+		}
+		// -- Update overlay
+		[self setTransform:overlayTransform andFrame:overlayFrame forView:self.overlayView];
+		if (self.overlayView.descriptionExpanded) {
+			[self.overlayView resetOverlayView];
+		}
+		// -- Update done button
+		[self setTransform:overlayTransform andFrame:doneFrame forView:self.doneButton];
+		
+		[self.photoTableView reloadData];
+		[self.photoTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_currentlySelectedIndex inSection:0] atScrollPosition:UITableViewScrollPositionNone animated:NO];
 
-    [self.photoTableView reloadData];
-	[self.photoTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_currentlySelectedIndex inSection:0] atScrollPosition:UITableViewScrollPositionNone animated:NO];
-    
-    _changingOrientation = NO;
+		_changingOrientation = NO;
+	}
 }
 
 - (void)setTransform:(CGAffineTransform)transform andFrame:(CGRect)frame forView:(UIView *)view

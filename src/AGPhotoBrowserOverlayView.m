@@ -139,7 +139,7 @@
     
     CGRect frame = self.superview.frame;
     CGRect overlayFrame = CGRectZero;
-    if (UIDeviceOrientationIsPortrait(orientation)) {
+    if (UIDeviceOrientationIsPortrait(orientation) || !UIDeviceOrientationIsLandscape(orientation)) {
         overlayFrame = CGRectMake(0, CGRectGetHeight(frame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(frame), AGPhotoBrowserOverlayInitialHeight);
     } else if (orientation == UIDeviceOrientationLandscapeLeft) {
         overlayFrame = CGRectMake(0, 0, AGPhotoBrowserOverlayInitialHeight, CGRectGetHeight(frame));
@@ -201,7 +201,7 @@
     
     CGRect currentOverlayFrame = self.frame;
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    if (UIDeviceOrientationIsPortrait(orientation)) {
+    if (UIDeviceOrientationIsPortrait(orientation) || !UIDeviceOrientationIsLandscape(orientation)) {
         int newSharingHeight = CGRectGetHeight(currentOverlayFrame) - 20 + newDescriptionSize.height;
         currentOverlayFrame.size.height = newSharingHeight;
         currentOverlayFrame.origin.y -= (newSharingHeight - CGRectGetHeight(self.bounds));
