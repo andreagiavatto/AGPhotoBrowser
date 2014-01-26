@@ -19,7 +19,7 @@ It currently supports:
 
 ## Install
 The suggested way to install the component is using [CocoaPods](http://cocoapods.org/), just include the following line in your Podfile:
-`pod "AGPhotoBrowser", "~> 1.0.6"`
+`pod "AGPhotoBrowser", "~> 1.1.0"`
 
 
 ## Usage
