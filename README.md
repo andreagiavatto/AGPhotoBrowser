@@ -15,17 +15,17 @@ It currently supports:
 - "Swipe up/down" to hide the photo browser
 - "Done/Action buttons" to dismiss the browser or perform a few operations on the selected image
 
-![1](https://s3-us-west-2.amazonaws.com/andreagiavatto.github.io/AGPhotoBrowser/AGPhotoBrowser.gif)
+![1](https://s3-us-west-2.amazonaws.com/andreagiavatto.github.io/AGPhotoBrowser/AGPhotoBrowser_demo.gif)
 
 ## Install
-The suggested way to install the component is using [CocoaPods](http://cocoapods.org/), just include the following line in your Podfile:
-`pod "AGPhotoBrowser", "~> 1.1.0"`
+The suggested way to install the component is using [CocoaPods](http://cocoapods.org/), just include the following line in your Podfile to get the latest version:
+`pod "AGPhotoBrowser"`
 
 
 ## Usage
 There is a demo project included that shows how to use the photo browser.
 - import `AGPhotoBrowserView.h` in your class
-- create a new instance of `AGPhotoBrowserView` and set the delegate and the dataSource
+- create a new instance of `AGPhotoBrowserView` and set the delegate and the dataSource to your class
 - implement `- (NSInteger)numberOfPhotosForPhotoBrowser:(AGPhotoBrowserView *)photoBrowser` and `- (UIImage *)photoBrowser:(AGPhotoBrowserView *)photoBrowser imageAtIndex:(NSInteger)index` methods from the datasource
 - (optional) provide a title and a description for each image implementing `- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser titleForImageAtIndex:(NSInteger)index` and `- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser descriptionForImageAtIndex:(NSInteger)index`
 - show the browser calling the `- (void)show` or `- (void)showFromIndex:(NSInteger)initialIndex` methods
