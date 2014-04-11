@@ -43,9 +43,6 @@ UIGestureRecognizerDelegate
 
 @end
 
-
-static NSString *CellIdentifier = @"AGPhotoBrowserCell";
-
 @implementation AGPhotoBrowserView
 
 const NSInteger AGPhotoBrowserThresholdToCenter = 150;
@@ -202,13 +199,14 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell<AGPhotoBrowserCellProtocol> *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    NSString *cellIdentifier = [NSString stringWithFormat:@"AGPhotoBrowserCell_%d", indexPath.row];
+    UITableViewCell<AGPhotoBrowserCellProtocol> *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (!cell) {
         if ([_dataSource respondsToSelector:@selector(cellForBrowser:withReuseIdentifier:)]) {
-            cell = [_dataSource cellForBrowser:self withReuseIdentifier:CellIdentifier];
+            cell = [_dataSource cellForBrowser:self withReuseIdentifier:cellIdentifier];
         } else {
             // -- Provide fallback if the user does not want its own implementation of a cell
-            cell = [[AGPhotoBrowserCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+            cell = [[AGPhotoBrowserCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         }
         
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;

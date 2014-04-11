@@ -7,7 +7,7 @@
 //
 
 #import "AGPhotoBrowserZoomableView.h"
-
+#import "UIImageView+AFNetworking.h"
 
 @interface AGPhotoBrowserZoomableView ()
 
@@ -46,6 +46,11 @@
 - (void)setImage:(UIImage *)image
 {
     self.imageView.image = image;
+}
+
+- (void)setImageURL:(NSURL *)url
+{
+    [self.imageView setImageWithURL:url];
 }
 
 

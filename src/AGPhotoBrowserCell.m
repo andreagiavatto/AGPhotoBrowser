@@ -127,6 +127,13 @@
 	[self setNeedsUpdateConstraints];
 }
 
+- (void)setCellImageWithURL:(NSURL *)url
+{
+    [self.zoomableView setImageURL:url];
+    
+    [self setNeedsUpdateConstraints];
+}
+
 
 #pragma mark - Public methods
 
