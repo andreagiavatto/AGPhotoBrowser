@@ -136,6 +136,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 	if (!_overlayView) {
 		_overlayView = [[AGPhotoBrowserOverlayView alloc] initWithFrame:CGRectZero];
         _overlayView.delegate = self;
+        _actionButton = _overlayView.actionButton;
 	}
 	
 	return _overlayView;
@@ -216,7 +217,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     }
 
     [self configureCell:cell forRowAtIndexPath:indexPath];
-    [self.overlayView resetOverlayView];
     
     return cell;
 }
