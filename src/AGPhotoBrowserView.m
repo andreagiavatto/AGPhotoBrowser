@@ -273,7 +273,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
         UITableView *tv = (UITableView*)scrollView;
         NSIndexPath *indexPathOfTopRowAfterScrolling = [tv indexPathForRowAtPoint:targetContentOffset];
 
-        [self setupPhotoForIndex:indexPathOfTopRowAfterScrolling.row];
+        [self setupPhotoForIndex:(int)indexPathOfTopRowAfterScrolling.row];
     }
 }
 
