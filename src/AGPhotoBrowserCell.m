@@ -51,15 +51,15 @@
     // -- Force the right frame
     CGRect correctFrame = frame;
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-	if (UIDeviceOrientationIsPortrait(orientation) || UIDeviceOrientationIsLandscape(orientation)) {
-		if (UIDeviceOrientationIsPortrait(orientation)) {
-			correctFrame.size.width = CGRectGetHeight([[UIScreen mainScreen] bounds]);
-			correctFrame.size.height = CGRectGetWidth([[UIScreen mainScreen] bounds]);
-		} else {
-			correctFrame.size.width = CGRectGetWidth([[UIScreen mainScreen] bounds]);
-			correctFrame.size.height = CGRectGetHeight([[UIScreen mainScreen] bounds]);
-		}
-	}
+    if (UIDeviceOrientationIsPortrait(orientation) || UIDeviceOrientationIsLandscape(orientation) || orientation == UIDeviceOrientationFaceUp) {
+        if (UIDeviceOrientationIsPortrait(orientation) || orientation == UIDeviceOrientationFaceUp) {
+            correctFrame.size.width = CGRectGetHeight([[UIScreen mainScreen] bounds]);
+            correctFrame.size.height = CGRectGetWidth([[UIScreen mainScreen] bounds]);
+        } else {
+            correctFrame.size.width = CGRectGetWidth([[UIScreen mainScreen] bounds]);
+            correctFrame.size.height = CGRectGetHeight([[UIScreen mainScreen] bounds]);
+        }
+    }
     
     [super setFrame:correctFrame];
 }

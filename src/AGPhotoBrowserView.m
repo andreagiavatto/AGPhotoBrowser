@@ -143,7 +143,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 
 - (CGFloat)cellHeight
 {
-	//UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
 	UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
 	if (UIDeviceOrientationIsLandscape(orientation)) {
 		return CGRectGetHeight(self.currentWindow.frame);
@@ -391,7 +390,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
 		CGPoint translatedPoint;
 		
-        if (UIDeviceOrientationIsPortrait(orientation)) {
+        if (UIDeviceOrientationIsPortrait(orientation) || orientation == UIDeviceOrientationFaceUp) {
             translatedPoint = CGPointMake(_startingPanPoint.x - endingPanPoint.y, _startingPanPoint.y);
         } else if (orientation == UIDeviceOrientationLandscapeLeft) {
             translatedPoint = CGPointMake(_startingPanPoint.x + endingPanPoint.x, _startingPanPoint.y);
@@ -403,7 +402,6 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		int heightDifference = abs(floor(_startingPanPoint.x - translatedPoint.x));
 		
 		if (heightDifference <= AGPhotoBrowserThresholdToCenter) {
-            
 			// -- Back to original center
 			[UIView animateWithDuration:AGPhotoBrowserAnimationDuration
 							 animations:^(){
@@ -429,7 +427,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
 		CGPoint translatedPoint;
 		
-        if (UIDeviceOrientationIsPortrait(orientation)) {
+        if (UIDeviceOrientationIsPortrait(orientation) || orientation == UIDeviceOrientationFaceUp) {
             translatedPoint = CGPointMake(_startingPanPoint.x - middlePanPoint.y, _startingPanPoint.y);
         } else if (orientation == UIDeviceOrientationLandscapeLeft) {
             translatedPoint = CGPointMake(_startingPanPoint.x + middlePanPoint.x, _startingPanPoint.y);
@@ -462,7 +460,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 {
     // -- Get the device orientation
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-	if (UIDeviceOrientationIsPortrait(orientation) || UIDeviceOrientationIsLandscape(orientation)) {
+	if (UIDeviceOrientationIsPortrait(orientation) || UIDeviceOrientationIsLandscape(orientation) || orientation == UIDeviceOrientationFaceUp) {
 		_changingOrientation = YES;
 		
 		CGFloat angleTable = UIInterfaceOrientationAngleOfOrientation(orientation);
@@ -477,7 +475,7 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
 		// -- Update table
 		[self setTransform:tableTransform andFrame:tableFrame forView:self.photoTableView];
 		
-		if (UIDeviceOrientationIsPortrait(orientation)) {
+		if (UIDeviceOrientationIsPortrait(orientation) || orientation == UIDeviceOrientationFaceUp) {
 			overlayFrame = CGRectMake(0, CGRectGetHeight(tableFrame) - AGPhotoBrowserOverlayInitialHeight, CGRectGetWidth(tableFrame), AGPhotoBrowserOverlayInitialHeight);
 			doneFrame = CGRectMake(CGRectGetWidth(tableFrame) - 60 - 10, 15, 60, 32);
 		} else if (orientation == UIDeviceOrientationLandscapeLeft) {
