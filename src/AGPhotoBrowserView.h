@@ -16,6 +16,7 @@
 @property (nonatomic, weak) id<AGPhotoBrowserDelegate> delegate;
 @property (nonatomic, weak) id<AGPhotoBrowserDataSource> dataSource;
 
+@property (nonatomic, strong) UIButton *actionButton;
 @property (nonatomic, strong, readonly) UIButton *doneButton;
 
 - (void)show;
