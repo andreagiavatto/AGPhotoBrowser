@@ -27,7 +27,7 @@ static const NSInteger AGPhotoBrowserOverlayInitialHeight = 100;
 
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *description;
-@property (nonatomic, strong, readonly) UIButton *actionButton;
+@property (nonatomic, strong) UIButton *actionButton;
 @property (nonatomic, strong, readonly) UILabel *titleLabel;
 @property (nonatomic, strong, readonly) UILabel *descriptionLabel;
 

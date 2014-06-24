@@ -24,7 +24,6 @@
 @property (nonatomic, strong, readwrite) UILabel *descriptionLabel;
 @property (nonatomic, strong) UIView *separatorView;
 @property (nonatomic, strong) UIButton *seeMoreButton;
-@property (nonatomic, strong, readwrite) UIButton *actionButton;
 
 @property (nonatomic, assign, readwrite, getter = isVisible) BOOL visible;
 
