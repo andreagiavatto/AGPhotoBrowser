@@ -93,7 +93,7 @@
         self.seeMoreButton.hidden = YES;
     }
 	
-    if ([_title length]) {
+    if ([_photoTitle length]) {
 		self.titleLabel.hidden = NO;
 		self.separatorView.hidden = NO;
 	} else {
@@ -101,7 +101,7 @@
 		self.separatorView.hidden = YES;
 	}
     
-    if (![_description length] && ![_title length]) {
+    if (![_photoDescription length] && ![_photoTitle length]) {
         _gradientLayer.hidden = YES;
     } else {
         _gradientLayer.hidden = NO;
@@ -255,12 +255,12 @@
 					 }];
 }
 
-- (void)setTitle:(NSString *)title
+- (void)setPhotoTitle:(NSString *)photoTitle
 {
-	_title = title;
+	_photoTitle = photoTitle;
 	
-    if (_title) {
-        self.titleLabel.text = _title;
+    if (_photoTitle) {
+        self.titleLabel.text = _photoTitle;
     } else {
 		self.descriptionLabel.text = @"";
 	}
@@ -268,12 +268,12 @@
     [self setNeedsLayout];
 }
 
-- (void)setDescription:(NSString *)description
+- (void)setPhotoDescription:(NSString *)photoDescription
 {
-	_description = description;
+	_photoDescription = photoDescription;
 	
-	if ([_description length]) {
-		self.descriptionLabel.text = _description;
+	if ([_photoDescription length]) {
+		self.descriptionLabel.text = _photoDescription;
 	} else {
 		self.descriptionLabel.text = @"";
 	}
