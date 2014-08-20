@@ -287,15 +287,15 @@ const NSInteger AGPhotoBrowserThresholdToCenter = 150;
     }
     
 	if ([_dataSource respondsToSelector:@selector(photoBrowser:titleForImageAtIndex:)]) {
-		self.overlayView.title = [_dataSource photoBrowser:self titleForImageAtIndex:_currentlySelectedIndex];
+		self.overlayView.photoTitle = [_dataSource photoBrowser:self titleForImageAtIndex:_currentlySelectedIndex];
 	} else {
-        self.overlayView.title = @"";
+        self.overlayView.photoTitle = @"";
     }
 	
 	if ([_dataSource respondsToSelector:@selector(photoBrowser:descriptionForImageAtIndex:)]) {
-		self.overlayView.description = [_dataSource photoBrowser:self descriptionForImageAtIndex:_currentlySelectedIndex];
+		self.overlayView.photoDescription = [_dataSource photoBrowser:self descriptionForImageAtIndex:_currentlySelectedIndex];
 	} else {
-        self.overlayView.description = @"";
+        self.overlayView.photoDescription = @"";
     }
 }
 
