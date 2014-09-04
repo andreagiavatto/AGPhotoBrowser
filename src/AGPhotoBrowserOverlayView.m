@@ -168,10 +168,10 @@
     
     CGSize descriptionSize;
     if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
-        descriptionSize = [self.description sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(newDescriptionWidth, MAXFLOAT)];
+        descriptionSize = [self.photoDescription sizeWithFont:self.descriptionLabel.font constrainedToSize:CGSizeMake(newDescriptionWidth, MAXFLOAT)];
     } else {
         NSDictionary *textAttributes = @{NSFontAttributeName : self.descriptionLabel.font};
-        CGRect descriptionBoundingRect = [self.description boundingRectWithSize:CGSizeMake(newDescriptionWidth, MAXFLOAT)
+        CGRect descriptionBoundingRect = [self.photoDescription boundingRectWithSize:CGSizeMake(newDescriptionWidth, MAXFLOAT)
                                                                         options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:textAttributes
                                                                         context:nil];
         descriptionSize = CGSizeMake(ceil(CGRectGetWidth(descriptionBoundingRect)), ceil(CGRectGetHeight(descriptionBoundingRect)));
