@@ -2,7 +2,7 @@
 //  AGPhotoBrowserCell.m
 //  AGPhotoBrowser
 //
-//  Created by Hellrider on 1/5/14.
+//  Created by Andrea Giavatto on 1/5/14.
 //  Copyright (c) 2014 Andrea Giavatto. All rights reserved.
 //
 
@@ -18,9 +18,9 @@
 
 @implementation AGPhotoBrowserCell
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+- (instancetype)initWithFrame:(CGRect)frame
 {
-	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+	self = [super initWithFrame:frame];
 	if (self) {
 		[self setupCell];
 	}
@@ -109,7 +109,7 @@
         CGPoint translation = [gestureRecognizer translationInView:[imageView superview]];
         
         // -- Check for horizontal gesture
-        if (fabsf(translation.x) > fabsf(translation.y)) {
+        if (fabs(translation.x) > fabs(translation.y)) {
             return YES;
         }
     }

@@ -2,13 +2,12 @@
 //  ViewController.m
 //  AGPhotoBrowser
 //
-//  Created by Hellrider on 7/28/13.
+//  Created by Andrea Giavatto on 7/28/13.
 //  Copyright (c) 2013 Andrea Giavatto. All rights reserved.
 //
 
 #import "ViewController.h"
-
-#import "AGPhotoBrowserView.h"
+#import "AGPhotoBrowserViewController.h"
 
 #define SAMPLE_IMAGE_1			[UIImage imageNamed:@"sample1.jpg"]
 #define SAMPLE_IMAGE_2			[UIImage imageNamed:@"sample2.jpg"]
@@ -21,7 +20,7 @@
 }
 
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
-@property (nonatomic, strong) AGPhotoBrowserView *browserView;
+@property (nonatomic, strong) AGPhotoBrowserViewController *browserViewController;
 
 @end
 
@@ -96,8 +95,10 @@
 
 #pragma mark - UITableView Delegate methods
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	[self.browserView showFromIndex:indexPath.row];
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	self.browserViewController.initialIndex = indexPath.row;
+	[self presentViewController:self.browserViewController animated:YES completion:nil];
 }
 
 
@@ -123,34 +124,34 @@
 		[cell.contentView addSubview:titleLabel];
 	}
 	
-	titleLabel.text = [self photoBrowser:self.browserView titleForImageAtIndex:indexPath.row];
-	imageView.image = [self photoBrowser:self.browserView imageAtIndex:indexPath.row];
+	titleLabel.text = [self photoBrowser:self.browserViewController titleForImageAtIndex:indexPath.row];
+	imageView.image = [self photoBrowser:self.browserViewController imageAtIndex:indexPath.row];
 }
 
 
 #pragma mark - AGPhotoBrowser datasource
 
-- (NSInteger)numberOfPhotosForPhotoBrowser:(AGPhotoBrowserView *)photoBrowser
+- (NSInteger)numberOfPhotosForPhotoBrowser:(AGPhotoBrowserViewController *)photoBrowser
 {
 	return _samplePictures.count;
 }
 
-- (UIImage *)photoBrowser:(AGPhotoBrowserView *)photoBrowser imageAtIndex:(NSInteger)index
+- (UIImage *)photoBrowser:(AGPhotoBrowserViewController *)photoBrowser imageAtIndex:(NSInteger)index
 {
 	return [[_samplePictures objectAtIndex:index] objectForKey:@"Image"];
 }
 
-- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser titleForImageAtIndex:(NSInteger)index
+- (NSString *)photoBrowser:(AGPhotoBrowserViewController *)photoBrowser titleForImageAtIndex:(NSInteger)index
 {
 	return [[_samplePictures objectAtIndex:index] objectForKey:@"Title"];
 }
 
-- (NSString *)photoBrowser:(AGPhotoBrowserView *)photoBrowser descriptionForImageAtIndex:(NSInteger)index
+- (NSString *)photoBrowser:(AGPhotoBrowserViewController *)photoBrowser descriptionForImageAtIndex:(NSInteger)index
 {
 	return [[_samplePictures objectAtIndex:index] objectForKey:@"Description"];
 }
 
-- (BOOL)photoBrowser:(AGPhotoBrowserView *)photoBrowser willDisplayActionButtonAtIndex:(NSInteger)index
+- (BOOL)photoBrowser:(AGPhotoBrowserViewController *)photoBrowser willDisplayActionButtonAtIndex:(NSInteger)index
 {
     // -- For testing purposes only
     if (index % 2) {
@@ -163,18 +164,15 @@
 
 #pragma mark - AGPhotoBrowser delegate
 
-- (void)photoBrowser:(AGPhotoBrowserView *)photoBrowser didTapOnDoneButton:(UIButton *)doneButton
+- (void)photoBrowser:(AGPhotoBrowserViewController *)viewController didTapOnDoneButton:(UIButton *)doneButton
 {
 	// -- Dismiss
-	NSLog(@"Dismiss the photo browser here");
-	[self.browserView hideWithCompletion:^(BOOL finished){
-		NSLog(@"Dismissed!");
-	}];
+	NSLog(@"Optional: get notified that the view controller is about to be dismissed");
 }
 
-- (void)photoBrowser:(AGPhotoBrowserView *)photoBrowser didTapOnActionButton:(UIButton *)actionButton atIndex:(NSInteger)index
+- (void)photoBrowser:(AGPhotoBrowserViewController *)viewController didTapOnActionButton:(UIButton *)actionButton atIndex:(NSInteger)index
 {
-	NSLog(@"Action button tapped at index %d!", index);
+	NSLog(@"Action button tapped at index %ld!", (long)index);
 	UIActionSheet *action = [[UIActionSheet alloc] initWithTitle:@""
 														delegate:nil
 											   cancelButtonTitle:NSLocalizedString(@"Cancel", @"Cancel button")
@@ -186,15 +184,15 @@
 
 #pragma mark - Getters
 
-- (AGPhotoBrowserView *)browserView
+- (AGPhotoBrowserViewController *)browserViewController
 {
-	if (!_browserView) {
-		_browserView = [[AGPhotoBrowserView alloc] initWithFrame:CGRectZero];
-		_browserView.delegate = self;
-		_browserView.dataSource = self;
+	if (!_browserViewController) {
+		_browserViewController = [[AGPhotoBrowserViewController alloc] initWithNibName:nil bundle:nil];
+		_browserViewController.delegate = self;
+		_browserViewController.dataSource = self;
 	}
 	
-	return _browserView;
+	return _browserViewController;
 }
 
 

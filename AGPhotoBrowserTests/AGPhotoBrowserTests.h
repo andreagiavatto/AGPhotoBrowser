@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 Andrea Giavatto. All rights reserved.
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
-@interface AGPhotoBrowserTests : SenTestCase
+@interface AGPhotoBrowserTests : XCTestCase
 
 @end
