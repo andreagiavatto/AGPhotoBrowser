@@ -8,6 +8,8 @@
 
 #import "ViewController.h"
 #import "AGPhotoBrowserViewController.h"
+#import "AGPhotoBrowserControllerTransitioningDelegate.h"
+#import "AGPhotoBrowserFadeInOutAnimator.h"
 
 #define SAMPLE_IMAGE_1			[UIImage imageNamed:@"sample1.jpg"]
 #define SAMPLE_IMAGE_2			[UIImage imageNamed:@"sample2.jpg"]
@@ -15,12 +17,12 @@
 #define SAMPLE_IMAGE_4			[UIImage imageNamed:@"sample4.jpg"]
 
 
-@interface ViewController () <UITableViewDataSource, UITableViewDelegate, AGPhotoBrowserDelegate, AGPhotoBrowserDataSource> {
-	NSArray *_samplePictures;
-}
+@interface ViewController () <UITableViewDataSource, UITableViewDelegate, AGPhotoBrowserDelegate, AGPhotoBrowserDataSource>
 
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
+@property (nonatomic, strong) NSArray *samplePictures;
 @property (nonatomic, strong) AGPhotoBrowserViewController *browserViewController;
+@property (nonatomic, strong) id<UIViewControllerTransitioningDelegate> transitioningDelegate;
 
 @end
 
@@ -31,7 +33,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
 		
-	_samplePictures = @[
+	self.samplePictures = @[
 	@{
 		  @"Image": SAMPLE_IMAGE_1,
 		  @"Title" : @"Hot air balloons",
@@ -55,21 +57,16 @@
 	];
 }
 
-- (void)didReceiveMemoryWarning
+#pragma mark - UITableViewDataSource
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-
-#pragma mark - UITableView Datasource
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return _samplePictures.count;
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return self.samplePictures.count;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -77,7 +74,8 @@
 	return 140;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     static NSString *cellIdentifier = @"SampleControllerCell";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
@@ -93,11 +91,13 @@
 }
 
 
-#pragma mark - UITableView Delegate methods
+#pragma mark - UITableViewDelegate methods
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	self.browserViewController.initialIndex = indexPath.row;
+	self.browserViewController.modalPresentationStyle = UIModalPresentationCustom;
+	self.browserViewController.transitioningDelegate = self.transitioningDelegate;
 	[self presentViewController:self.browserViewController animated:YES completion:nil];
 }
 
@@ -117,7 +117,7 @@
 	
 	UILabel *titleLabel = (UILabel *)[cell.contentView viewWithTag:2];
 	if (!titleLabel) {
-		titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 15, 280, 15)];
+		titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 15, CGRectGetWidth(cell.contentView.bounds) - 40, 15)];
 		titleLabel.font = [UIFont boldSystemFontOfSize:17];
 		titleLabel.textAlignment = NSTextAlignmentCenter;
 		
@@ -129,26 +129,26 @@
 }
 
 
-#pragma mark - AGPhotoBrowser datasource
+#pragma mark - AGPhotoBrowserDataSource
 
 - (NSInteger)numberOfPhotosForPhotoBrowser:(AGPhotoBrowserViewController *)photoBrowser
 {
-	return _samplePictures.count;
+	return self.samplePictures.count;
 }
 
 - (UIImage *)photoBrowser:(AGPhotoBrowserViewController *)photoBrowser imageAtIndex:(NSInteger)index
 {
-	return [[_samplePictures objectAtIndex:index] objectForKey:@"Image"];
+	return [[self.samplePictures objectAtIndex:index] objectForKey:@"Image"];
 }
 
 - (NSString *)photoBrowser:(AGPhotoBrowserViewController *)photoBrowser titleForImageAtIndex:(NSInteger)index
 {
-	return [[_samplePictures objectAtIndex:index] objectForKey:@"Title"];
+	return [[self.samplePictures objectAtIndex:index] objectForKey:@"Title"];
 }
 
 - (NSString *)photoBrowser:(AGPhotoBrowserViewController *)photoBrowser descriptionForImageAtIndex:(NSInteger)index
 {
-	return [[_samplePictures objectAtIndex:index] objectForKey:@"Description"];
+	return [[self.samplePictures objectAtIndex:index] objectForKey:@"Description"];
 }
 
 - (BOOL)photoBrowser:(AGPhotoBrowserViewController *)photoBrowser willDisplayActionButtonAtIndex:(NSInteger)index
@@ -161,8 +161,7 @@
     return NO;
 }
 
-
-#pragma mark - AGPhotoBrowser delegate
+#pragma mark - AGPhotoBrowserDelegate
 
 - (void)photoBrowser:(AGPhotoBrowserViewController *)viewController didTapOnDoneButton:(UIButton *)doneButton
 {
@@ -182,7 +181,7 @@
 }
 
 
-#pragma mark - Getters
+#pragma mark - Properties
 
 - (AGPhotoBrowserViewController *)browserViewController
 {
@@ -195,5 +194,13 @@
 	return _browserViewController;
 }
 
+- (id<UIViewControllerTransitioningDelegate>)transitioningDelegate {
+	
+	if (!_transitioningDelegate) {
+		_transitioningDelegate = [[AGPhotoBrowserControllerTransitioningDelegate alloc] initWithAnimator:[[AGPhotoBrowserFadeInOutAnimator alloc] init]];
+	}
+	
+	return _transitioningDelegate;
+}
 
 @end

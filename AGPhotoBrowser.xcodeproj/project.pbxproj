@@ -18,7 +18,6 @@
 		DE2A3D8E17A575C700CE0CA5 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DE2A3D8D17A575C700CE0CA5 /* Default@2x.png */; };
 		DE2A3D9017A575C700CE0CA5 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DE2A3D8F17A575C700CE0CA5 /* Default-568h@2x.png */; };
 		DE2A3D9317A575C700CE0CA5 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DE2A3D9217A575C700CE0CA5 /* ViewController.m */; };
-		DE2A3D9617A575C700CE0CA5 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE2A3D9417A575C700CE0CA5 /* ViewController.xib */; };
 		DE2A3D9F17A575C700CE0CA5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE2A3D7917A575C700CE0CA5 /* UIKit.framework */; };
 		DE2A3DA017A575C700CE0CA5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE2A3D7B17A575C700CE0CA5 /* Foundation.framework */; };
 		DE2A3DA817A575C700CE0CA5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DE2A3DA617A575C700CE0CA5 /* InfoPlist.strings */; };
@@ -32,6 +31,9 @@
 		DE61D9761B38BB4B00665BDD /* AGPhotoBrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DE61D9741B38BB4B00665BDD /* AGPhotoBrowserViewController.m */; };
 		DE61D9781B38BB4B00665BDD /* AGPhotoBrowserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE61D9751B38BB4B00665BDD /* AGPhotoBrowserViewController.xib */; };
 		DE61D9791B38BB4B00665BDD /* AGPhotoBrowserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE61D9751B38BB4B00665BDD /* AGPhotoBrowserViewController.xib */; };
+		DE61D9821B3E989300665BDD /* AGPhotoBrowserControllerTransitioningDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DE61D9811B3E989300665BDD /* AGPhotoBrowserControllerTransitioningDelegate.m */; };
+		DE61D9861B3E99E200665BDD /* AGPhotoBrowserFadeInOutAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = DE61D9841B3E99E200665BDD /* AGPhotoBrowserFadeInOutAnimator.m */; };
+		DE61D9881B3E9DE900665BDD /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE61D9871B3E9DE900665BDD /* ViewController.xib */; };
 		DE9D38E417A5ABA10058BC67 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE9D38E317A5ABA10058BC67 /* QuartzCore.framework */; };
 		KIYDQKWBMRKIEYEVRWSLKUDQ /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = HYXIFWTDXJPPRRMDCEPMDTJH /* libz.dylib */; };
 /* End PBXBuildFile section */
@@ -63,7 +65,6 @@
 		DE2A3D8F17A575C700CE0CA5 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		DE2A3D9117A575C700CE0CA5 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		DE2A3D9217A575C700CE0CA5 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		DE2A3D9517A575C700CE0CA5 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
 		DE2A3D9C17A575C700CE0CA5 /* AGPhotoBrowserTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AGPhotoBrowserTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE2A3DA517A575C700CE0CA5 /* AGPhotoBrowserTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AGPhotoBrowserTests-Info.plist"; sourceTree = "<group>"; };
 		DE2A3DA717A575C700CE0CA5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -86,6 +87,12 @@
 		DE61D9741B38BB4B00665BDD /* AGPhotoBrowserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AGPhotoBrowserViewController.m; sourceTree = "<group>"; };
 		DE61D9751B38BB4B00665BDD /* AGPhotoBrowserViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AGPhotoBrowserViewController.xib; sourceTree = "<group>"; };
 		DE61D97B1B38C5C600665BDD /* AGPhotoBrowserCellProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserCellProtocol.h; sourceTree = "<group>"; };
+		DE61D9801B3E989300665BDD /* AGPhotoBrowserControllerTransitioningDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserControllerTransitioningDelegate.h; sourceTree = "<group>"; };
+		DE61D9811B3E989300665BDD /* AGPhotoBrowserControllerTransitioningDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AGPhotoBrowserControllerTransitioningDelegate.m; sourceTree = "<group>"; };
+		DE61D9831B3E99E200665BDD /* AGPhotoBrowserFadeInOutAnimator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserFadeInOutAnimator.h; sourceTree = "<group>"; };
+		DE61D9841B3E99E200665BDD /* AGPhotoBrowserFadeInOutAnimator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AGPhotoBrowserFadeInOutAnimator.m; sourceTree = "<group>"; };
+		DE61D9851B3E99E200665BDD /* AGCustomAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGCustomAnimation.h; sourceTree = "<group>"; };
+		DE61D9871B3E9DE900665BDD /* ViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewController.xib; sourceTree = "<group>"; };
 		DE9D38E317A5ABA10058BC67 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		HYXIFWTDXJPPRRMDCEPMDTJH /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -149,13 +156,13 @@
 		DE2A3D7F17A575C700CE0CA5 /* AGPhotoBrowser */ = {
 			isa = PBXGroup;
 			children = (
-				DE48791517CA84740048D0FC /* src */,
 				DE2A3D8817A575C700CE0CA5 /* AppDelegate.h */,
 				DE2A3D8917A575C700CE0CA5 /* AppDelegate.m */,
+				DE48791517CA84740048D0FC /* src */,
+				DE2A3D8017A575C700CE0CA5 /* Supporting Files */,
 				DE2A3D9117A575C700CE0CA5 /* ViewController.h */,
 				DE2A3D9217A575C700CE0CA5 /* ViewController.m */,
-				DE2A3D9417A575C700CE0CA5 /* ViewController.xib */,
-				DE2A3D8017A575C700CE0CA5 /* Supporting Files */,
+				DE61D9871B3E9DE900665BDD /* ViewController.xib */,
 			);
 			path = AGPhotoBrowser;
 			sourceTree = "<group>";
@@ -239,6 +246,11 @@
 		DE61D9661B38BAFE00665BDD /* Public */ = {
 			isa = PBXGroup;
 			children = (
+				DE61D9831B3E99E200665BDD /* AGPhotoBrowserFadeInOutAnimator.h */,
+				DE61D9841B3E99E200665BDD /* AGPhotoBrowserFadeInOutAnimator.m */,
+				DE61D9851B3E99E200665BDD /* AGCustomAnimation.h */,
+				DE61D9801B3E989300665BDD /* AGPhotoBrowserControllerTransitioningDelegate.h */,
+				DE61D9811B3E989300665BDD /* AGPhotoBrowserControllerTransitioningDelegate.m */,
 				DE61D9671B38BAFE00665BDD /* AGPhotoBrowserDataSource.h */,
 				DE61D9681B38BAFE00665BDD /* AGPhotoBrowserDelegate.h */,
 				DE61D9691B38BAFE00665BDD /* AGPhotoBrowserView.h */,
@@ -322,11 +334,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DE61D9881B3E9DE900665BDD /* ViewController.xib in Resources */,
 				DE2A3D8417A575C700CE0CA5 /* InfoPlist.strings in Resources */,
 				DE2A3D8C17A575C700CE0CA5 /* Default.png in Resources */,
 				DE2A3D8E17A575C700CE0CA5 /* Default@2x.png in Resources */,
 				DE2A3D9017A575C700CE0CA5 /* Default-568h@2x.png in Resources */,
-				DE2A3D9617A575C700CE0CA5 /* ViewController.xib in Resources */,
 				DE2E1B2417C923BF0027C3C8 /* sample1.jpg in Resources */,
 				DE61D9781B38BB4B00665BDD /* AGPhotoBrowserViewController.xib in Resources */,
 				DE2E1B2517C923BF0027C3C8 /* sample2.jpg in Resources */,
@@ -367,6 +379,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DE61D9861B3E99E200665BDD /* AGPhotoBrowserFadeInOutAnimator.m in Sources */,
+				DE61D9821B3E989300665BDD /* AGPhotoBrowserControllerTransitioningDelegate.m in Sources */,
 				DE2A3D8617A575C700CE0CA5 /* main.m in Sources */,
 				DE61D96D1B38BAFE00665BDD /* AGPhotoBrowserOverlayView.m in Sources */,
 				DE61D96B1B38BAFE00665BDD /* AGPhotoBrowserCell.m in Sources */,
@@ -402,14 +416,6 @@
 				DE2A3D8317A575C700CE0CA5 /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		DE2A3D9417A575C700CE0CA5 /* ViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DE2A3D9517A575C700CE0CA5 /* en */,
-			);
-			name = ViewController.xib;
 			sourceTree = "<group>";
 		};
 		DE2A3DA617A575C700CE0CA5 /* InfoPlist.strings */ = {
