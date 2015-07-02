@@ -9,10 +9,10 @@
 #import "AGPhotoBrowserCell.h"
 #import "AGPhotoBrowserZoomableView.h"
 
-@interface AGPhotoBrowserCell () <AGPhotoBrowserZoomableViewDelegate>
+@interface AGPhotoBrowserCell () <AGPhotoBrowserZoomableViewDelegate, UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) AGPhotoBrowserZoomableView *zoomableView;
-@property (nonatomic, strong) UIPanGestureRecognizer *panGesture;
+@property (nonatomic, strong) UIPanGestureRecognizer *panGestureRecognizer;
 
 @end
 
@@ -22,48 +22,12 @@
 {
 	self = [super initWithFrame:frame];
 	if (self) {
+		
 		[self setupCell];
 	}
 	
 	return self;
 }
-
-- (void)updateConstraints
-{
-	[self.contentView removeConstraints:self.contentView.constraints];
-	
-	NSDictionary *constrainedViews = NSDictionaryOfVariableBindings(_zoomableView);
-	
-	[self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_zoomableView]|"
-																			 options:0
-																			 metrics:@{}
-																			   views:constrainedViews]];
-	[self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_zoomableView]|"
-																			 options:0
-																			 metrics:@{}
-																			   views:constrainedViews]];
-	
-	[super updateConstraints];
-}
-
-- (void)setFrame:(CGRect)frame
-{
-    // -- Force the right frame
-    CGRect correctFrame = frame;
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    if (UIDeviceOrientationIsPortrait(orientation) || UIDeviceOrientationIsLandscape(orientation) || orientation == UIDeviceOrientationFaceUp) {
-        if (UIDeviceOrientationIsPortrait(orientation) || orientation == UIDeviceOrientationFaceUp) {
-            correctFrame.size.width = CGRectGetHeight([[UIScreen mainScreen] bounds]);
-            correctFrame.size.height = CGRectGetWidth([[UIScreen mainScreen] bounds]);
-        } else {
-            correctFrame.size.width = CGRectGetWidth([[UIScreen mainScreen] bounds]);
-            correctFrame.size.height = CGRectGetHeight([[UIScreen mainScreen] bounds]);
-        }
-    }
-    
-    [super setFrame:correctFrame];
-}
-
 
 #pragma mark - Getters
 
@@ -74,7 +38,7 @@
 		_zoomableView.userInteractionEnabled = YES;
         _zoomableView.zoomableDelegate = self;
 		
-		[_zoomableView addGestureRecognizer:self.panGesture];
+		[_zoomableView addGestureRecognizer:self.panGestureRecognizer];
         
 		CGAffineTransform transform = CGAffineTransformMakeRotation(M_PI_2);
 		CGPoint origin = _zoomableView.frame.origin;
@@ -87,16 +51,16 @@
 	return _zoomableView;
 }
 
-- (UIPanGestureRecognizer *)panGesture
+- (UIPanGestureRecognizer *)panGestureRecognizer
 {
-    if (!_panGesture) {
-        _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(p_imageViewPanned:)];
-		_panGesture.delegate = self;
-		_panGesture.maximumNumberOfTouches = 1;
-		_panGesture.minimumNumberOfTouches = 1;
+    if (!_panGestureRecognizer) {
+        _panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(p_imageViewPanned:)];
+		_panGestureRecognizer.delegate = self;
+		_panGestureRecognizer.maximumNumberOfTouches = 1;
+		_panGestureRecognizer.minimumNumberOfTouches = 1;
     }
     
-    return _panGesture;
+    return _panGestureRecognizer;
 }
 
 
@@ -104,7 +68,7 @@
 
 - (BOOL)gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)gestureRecognizer
 {
-    if (gestureRecognizer == self.panGesture) {
+    if (gestureRecognizer == self.panGestureRecognizer) {
         UIView *imageView = [gestureRecognizer view];
         CGPoint translation = [gestureRecognizer translationInView:[imageView superview]];
         
@@ -140,15 +104,17 @@
 
 - (void)setupCell
 {
-    self.contentView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	[self.contentView addSubview:self.zoomableView];
+	
+	NSDictionary *constrainedViews = NSDictionaryOfVariableBindings(_zoomableView);
+	[self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_zoomableView]|" options:0 metrics:@{} views:constrainedViews]];
+	[self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_zoomableView]|" options:0 metrics:@{} views:constrainedViews]];
 }
 
 - (void)p_imageViewPanned:(UIPanGestureRecognizer *)recognizer
 {
 	[self.delegate didPanOnZoomableViewForCell:self withRecognizer:recognizer];
 }
-
 
 #pragma mark - AGPhotoBrowserZoomableViewDelegate
 

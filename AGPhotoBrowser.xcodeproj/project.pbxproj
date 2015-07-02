@@ -65,7 +65,7 @@
 		DE2A3D8F17A575C700CE0CA5 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		DE2A3D9117A575C700CE0CA5 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		DE2A3D9217A575C700CE0CA5 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		DE2A3D9C17A575C700CE0CA5 /* AGPhotoBrowserTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AGPhotoBrowserTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE2A3D9C17A575C700CE0CA5 /* AGPhotoBrowserTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AGPhotoBrowserTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE2A3DA517A575C700CE0CA5 /* AGPhotoBrowserTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AGPhotoBrowserTests-Info.plist"; sourceTree = "<group>"; };
 		DE2A3DA717A575C700CE0CA5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DE2A3DA917A575C700CE0CA5 /* AGPhotoBrowserTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserTests.h; sourceTree = "<group>"; };
@@ -81,8 +81,6 @@
 		DE61D9651B38BAFE00665BDD /* AGPhotoBrowserZoomableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AGPhotoBrowserZoomableView.m; sourceTree = "<group>"; };
 		DE61D9671B38BAFE00665BDD /* AGPhotoBrowserDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserDataSource.h; sourceTree = "<group>"; };
 		DE61D9681B38BAFE00665BDD /* AGPhotoBrowserDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserDelegate.h; sourceTree = "<group>"; };
-		DE61D9691B38BAFE00665BDD /* AGPhotoBrowserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserView.h; sourceTree = "<group>"; };
-		DE61D96A1B38BAFE00665BDD /* AGPhotoBrowserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AGPhotoBrowserView.m; sourceTree = "<group>"; };
 		DE61D9731B38BB4B00665BDD /* AGPhotoBrowserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGPhotoBrowserViewController.h; sourceTree = "<group>"; };
 		DE61D9741B38BB4B00665BDD /* AGPhotoBrowserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AGPhotoBrowserViewController.m; sourceTree = "<group>"; };
 		DE61D9751B38BB4B00665BDD /* AGPhotoBrowserViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AGPhotoBrowserViewController.xib; sourceTree = "<group>"; };
@@ -136,7 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				DE2A3D7617A575C700CE0CA5 /* AGPhotoBrowser.app */,
-				DE2A3D9C17A575C700CE0CA5 /* AGPhotoBrowserTests.octest */,
+				DE2A3D9C17A575C700CE0CA5 /* AGPhotoBrowserTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -253,8 +251,6 @@
 				DE61D9811B3E989300665BDD /* AGPhotoBrowserControllerTransitioningDelegate.m */,
 				DE61D9671B38BAFE00665BDD /* AGPhotoBrowserDataSource.h */,
 				DE61D9681B38BAFE00665BDD /* AGPhotoBrowserDelegate.h */,
-				DE61D9691B38BAFE00665BDD /* AGPhotoBrowserView.h */,
-				DE61D96A1B38BAFE00665BDD /* AGPhotoBrowserView.m */,
 				DE61D9731B38BB4B00665BDD /* AGPhotoBrowserViewController.h */,
 				DE61D9741B38BB4B00665BDD /* AGPhotoBrowserViewController.m */,
 				DE61D9751B38BB4B00665BDD /* AGPhotoBrowserViewController.xib */,
@@ -298,7 +294,7 @@
 			);
 			name = AGPhotoBrowserTests;
 			productName = AGPhotoBrowserTests;
-			productReference = DE2A3D9C17A575C700CE0CA5 /* AGPhotoBrowserTests.octest */;
+			productReference = DE2A3D9C17A575C700CE0CA5 /* AGPhotoBrowserTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
