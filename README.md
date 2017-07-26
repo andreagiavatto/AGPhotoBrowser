@@ -1,3 +1,5 @@
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
 AGPhotoBrowser
 ==============
 
@@ -15,7 +17,6 @@ It currently supports:
 - "Swipe up/down" to hide the photo browser
 - "Done/Action buttons" to dismiss the browser or perform a few operations on the selected image
 
-![1](https://s3-us-west-2.amazonaws.com/andreagiavatto.github.io/AGPhotoBrowser/AGPhotoBrowser_demo.gif)
 
 ## Install
 The suggested way to install the component is using [CocoaPods](http://cocoapods.org/), just include the following line in your Podfile to get the latest version:
