@@ -35,11 +35,3 @@ There is a demo project included that shows how to use the photo browser.
 ## TO-DO
 - ~~add pinch to zoom gesture on images~~ (from 1.0.4, thanks @dtsolis)
 - ~~support orientation changes~~ (from 1.0.6)
-
-## Resources
-
-Info can be found on [my website](http://www.andreagiavatto.com), [and on Twitter](http://twitter.com/andreagiavatto).
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/andreagiavatto/agphotobrowser/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
